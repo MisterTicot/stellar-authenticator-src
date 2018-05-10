@@ -201,10 +201,6 @@ async function upgrade () {
       database has been rewritten. In order to switch to the new format, please
       provide an username and your password.`)
     .addSeparator()
-    .addMessage(`This process is very quick. However, if you don't want to do
-      that now, you can still access the old interface at
-      https://old.stellar-authenticator.org`)
-    .addSeparator()
     .putInfoNode()
     .addTextBox('user', 'Username')
     .addPasswordBox('password', 'Authenticator password')
