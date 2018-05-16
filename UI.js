@@ -314,6 +314,8 @@ async function parseQuery (query) {
       return
     }
     await fundTestAccount(publicKey)
+    parseQuery(query)
+    return
   }
 
   try {
@@ -338,7 +340,6 @@ function fundTestAccount (publicKey) {
       fundingMsg.destroy()
       if (currentAccount() !== account) return
       if (xhr.readyState === 4 && xhr.status === 200) {
-        new Notification('done', 'Testnet account funded')
         resolve()
       } else {
         console.log(xhr.response)
@@ -355,6 +356,7 @@ const uriViewerForm = new Form(node.grab('#uriViewer'))
 const uriBox = uriViewerForm.inputs.uri
 const xdrViewerForm = new Form(node.grab('#xdrViewer'))
 const xdrBox = xdrViewerForm.inputs.xdr
+
 const signingButton = node.grab('#signingButton')
 signingButton.disabled = true
 
@@ -364,10 +366,22 @@ export function signAndSend () {
     await popup.setInfo('Signing transaction...')
     const account = currentAccount()
     const seed = await global.db.secretSeed(password, account)
+    await global.cosmicLink.sign(seed)
     signingButton.disabled = true
-    global.cosmicLink.sign(seed)
-    global.cosmicLink.send()
-  })
+
+    popup.destroy()
+
+    top()
+    const message2 = new Notification('loading', 'Sending transaction...')
+    try {
+      await global.cosmicLink.send()
+      new Notification('done', 'Transaction validated')
+    } catch (error) {
+      console.log(error)
+      new Notification('warning', 'Transaction rejected', error)
+    }
+    message2.destroy()
+    })
 }
 
 export function closeTransaction () {
