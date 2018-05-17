@@ -199,11 +199,17 @@ export class Database {
     return sortCI(Object.keys(this.accounts))
   }
 
-  async secretSeed (password, name = this.current) {
-    this.checkAccountExist(name)
+  async secretSeed (password, ...names) {
+    names.forEach(name => this.checkAccountExist(name))
     const seedsKey = await this.seedsKey(password)
-    const encryptedSeed = this.accounts[name].seed
-    return decryptString(encryptedSeed, seedsKey)
+    const seeds = []
+    for (let index in names) {
+      const account = names[index]
+      const seed = await decryptString(this.accounts[account].seed, seedsKey)
+      seeds.push(seed)
+    }
+    if (seeds.length === 1) return seeds[0]
+    else return seeds
   }
 
   async keypair (password, name = this.current) {
@@ -219,6 +225,18 @@ export class Database {
   network (name = this.current) {
     this.checkAccountExist(name)
     return this.accounts[name].network
+  }
+
+  accountName (publicKey, network) {
+    for (let account in this.accounts) {
+      if (
+        this.accounts[account].id === publicKey
+        && this.accounts[account].network === network
+      ) {
+        return account
+      }
+    }
+    return undefined
   }
 
   /// Import / Export

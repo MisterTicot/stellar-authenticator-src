@@ -11,7 +11,7 @@ const global = {
   cosmicLink: null,
   db: null,
   query: null,
-  xdr: null,
+  signers: null,
   history: history.length
 }
 
@@ -230,11 +230,14 @@ function handleQuery () {
   }
 
   headerShowAccounts()
+  refreshAccountSelector()
+  refreshPublicKey()
   showMessages()
   footerShowAbout()
 
   if (location.search.length > 1) {
     resetReadTransactionPage()
+    selectPage(readTransactionPage)
     parseQuery(location.search)
   } else {
     resetOpenTransactionPage()
@@ -277,12 +280,14 @@ function resetOpenTransactionPage () {
 const transactionNode = node.grab('#CL_transactionNode')
 
 async function parseQuery (query) {
-  selectPage(readTransactionPage)
   const account = currentAccount()
   const network = account && global.db.network(account)
   const publicKey = account && global.db.publicKey(account)
-  global.cosmicLink = new CosmicLink(query, network, publicKey)
 
+  global.cosmicLink = new CosmicLink(query, network, publicKey)
+  const tdesc = await global.cosmicLink.getTdesc()
+
+  /// Display transaction URI
   if (query.substr(0, 1) === '?') {
     try {
       const uri = await global.cosmicLink.getUri()
@@ -292,10 +297,11 @@ async function parseQuery (query) {
     }
   } else uriBox.value = query
 
+  /// No account selected in the UI
   if (!account) {
-    const tdesc = await global.cosmicLink.getTdesc()
     if (tdesc.source) {
-      try { xdrBox.value = await global.cosmicLink.getXdr() } catch (error) { xdrBox.placeholder = error.message }
+      try { xdrBox.value = await global.cosmicLink.getXdr() }
+      catch (error) { xdrBox.placeholder = error.message }
     } else {
       xdrBox.placeholder = 'No source account selected'
     }
@@ -303,6 +309,46 @@ async function parseQuery (query) {
   }
 
   const loadingMsg = new Notification('loading', 'Loading account...')
+
+  /// Find legit signers
+  const signers = await global.cosmicLink.getSigners()
+  global.signers = []
+  if (tdesc.source) {
+    for (let index in accountSelector.childNodes) {
+      const accountNode = accountSelector.childNodes[index]
+      const accountName = accountNode.value
+      if (!accountName) continue
+      const publicKey = global.db.publicKey(accountName)
+      if (signers.find(entry => entry.value === publicKey)) {
+        global.signers.push(accountName)
+      } else {
+        accountNode.disabled = true
+      }
+    }
+
+    if (global.signers.length === 0) {
+      accountSelector.selectedIndex = -1
+      refreshPublicKey()
+      loadingMsg.destroy()
+      parseQuery(query)
+      new Notification('warning', 'No legit signer for this transaction')
+      return
+    }
+
+    if (!global.signers.find(entry => entry === account)) {
+      accountSelector.value = global.signers[0]
+      refreshPublicKey()
+      loadingMsg.destroy()
+      parseQuery(query)
+      return
+    }
+  } else {
+    signers.forEach(signer => {
+      const accountName = global.db.accountName(signer.value, network)
+      if (accountName) global.signers.push(accountName)
+    })
+  }
+
   let exist = await accountExist(publicKey, network)
   loadingMsg.destroy()
   if (currentAccount() !== account) return
@@ -364,9 +410,11 @@ export function signAndSend () {
   const popup = passwordPopup(global.db.username, 'Sign & send')
   popup.addValidator(async password => {
     await popup.setInfo('Signing transaction...')
-    const account = currentAccount()
-    const seed = await global.db.secretSeed(password, account)
-    await global.cosmicLink.sign(seed)
+
+    const seeds = await global.db.secretSeed(password, ...global.signers)
+    console.log(seeds)
+    if (typeof seeds === 'string') await global.cosmicLink.sign(seeds)
+    else for (let index in seeds) await global.cosmicLink.sign(seeds[index])
     signingButton.disabled = true
 
     popup.destroy()
@@ -430,6 +478,7 @@ const notificationsNode = node.grab('#notifications')
 function refreshPage () {
   refreshAccountSelector()
   refreshPublicKey()
+  handleQuery()
 }
 
 export function selectAccount (account) {
@@ -440,6 +489,7 @@ export function selectAccount (account) {
   }
   localStorage[global.db.username + '_lastSelected'] = accountSelector.selectedIndex
   refreshPublicKey()
+  handleQuery()
   resetMenu()
 }
 
@@ -468,14 +518,11 @@ function refreshAccountSelector () {
 
 async function refreshPublicKey () {
   const account = currentAccount()
-  const publicKey = global.db.publicKey(account)
-  if (!account) publicKeyNode.value = ''
-  else publicKeyNode.value = publicKey
+  if (account) publicKeyNode.value = global.db.publicKey(account)
+  else publicKeyNode.value = null
 
   const copiedNode = node.grab('#copied')
   if (copiedNode) node.destroy(copiedNode)
-
-  handleQuery()
 }
 
 /** *************************** Settings ***************************************/
@@ -519,6 +566,7 @@ export function showSetting (setting) {
 
 export function showSecret () {
   const account = currentAccount()
+  if (!account) return
   const popup = passwordPopup(global.db.username,
     node.create('div', null,
       'Show secret seed for: ' + account,
@@ -550,6 +598,7 @@ function hideSecret () {
 
 export function removeAccount () {
   const account = currentAccount()
+  if (!account) return
 
   const popup = passwordPopup(global.db.username,
     node.create('div', null,
@@ -729,3 +778,5 @@ function about () {
   selectPage(aboutPage)
   node.hide(aboutLinkNode)
 }
+
+
