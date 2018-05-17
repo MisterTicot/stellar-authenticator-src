@@ -240,7 +240,6 @@ function handleQuery () {
     selectPage(readTransactionPage)
     parseQuery(location.search)
   } else {
-    resetOpenTransactionPage()
     selectPage(openTransactionPage)
   }
 }
@@ -256,6 +255,7 @@ const openUriForm = new Form(node.grab('#openUri'))
     const query = uri.replace(/^[^?]*/, '')
     if (query < 2) throw new Error('Not a transaction link')
     pushQuery(query)
+    openUriForm.reset()
   })
 
 const openXdrForm = new Form(node.grab('#openXdr'))
@@ -264,16 +264,12 @@ const openXdrForm = new Form(node.grab('#openXdr'))
       const xdr = openXdrForm.inputs.xdr.value
       new StellarSdk.Transaction(xdr)
       pushQuery('?xdr=' + xdr)
+      openXdrForm.reset()
     } catch (error) {
       console.log(error)
       throw new Error('Invalid XDR')
     }
   })
-
-function resetOpenTransactionPage () {
-  openUriForm.reset()
-  openXdrForm.reset()
-}
 
 /** ***************************** Read transaction *****************************/
 
