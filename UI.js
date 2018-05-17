@@ -10,7 +10,6 @@ import * as node from './cosmic-lib/node'
 const global = {
   cosmicLink: null,
   db: null,
-  query: null,
   signers: null,
   history: history.length
 }
@@ -408,7 +407,6 @@ export function signAndSend () {
     await popup.setInfo('Signing transaction...')
 
     const seeds = await global.db.secretSeed(password, ...global.signers)
-    console.log(seeds)
     if (typeof seeds === 'string') await global.cosmicLink.sign(seeds)
     else for (let index in seeds) await global.cosmicLink.sign(seeds[index])
     signingButton.disabled = true
