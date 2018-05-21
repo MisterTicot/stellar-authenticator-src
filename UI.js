@@ -12,7 +12,7 @@ const global = {
   db: null,
   query: null,
   xdr: null,
-  history: 0
+  history: history.length
 }
 
 /** * helpers ***/
@@ -387,17 +387,19 @@ function resetReadTransactionPage () {
 
 export function pushQuery (query) {
   history.pushState(null, '', query)
-  global.history++
   handleQuery()
 }
 
 export function popQuery () {
-  if (document.referrer || global.history) {
-    global.history--
-    history.back()
-  } else {
+  if (
+    global.history === history.length
+    && global.history !== 2
+    && !document.referrer
+  ) {
     history.replaceState(null, '', '?')
     handleQuery()
+  } else {
+    history.back()
   }
 }
 
