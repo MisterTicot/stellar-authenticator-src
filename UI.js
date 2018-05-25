@@ -280,20 +280,37 @@ async function parseQuery (query) {
   const publicKey = account && global.db.publicKey(account)
 
   global.cosmicLink = new CosmicLink(query, network, publicKey)
-  const tdesc = await global.cosmicLink.getTdesc()
+  if (! account) return
+
+  /// Check if account exists.
   const loadingMsg = new Notification('loading', 'Loading account...')
+  let exist = await accountExist(publicKey, network)
+  loadingMsg.destroy()
+  if (currentAccount() !== account) return
+
+  /// Fund empty test accounts.
+  if (!exist) {
+    if (network === 'test') {
+      await fundTestAccount(publicKey)
+      parseQuery(query)
+      return
+    }
+  }
 
   /// Find legit signers
+  const tdesc = await global.cosmicLink.getTdesc()
   const signers = await global.cosmicLink.getSigners()
   global.signers = []
   if (tdesc.source) {
     for (let index in accountSelector.childNodes) {
       const accountNode = accountSelector.childNodes[index]
       const accountName = accountNode.value
+      const source = await global.cosmicLink.getSource()
       if (!accountName) continue
       const publicKey = global.db.publicKey(accountName)
       if (signers.find(entry => entry.value === publicKey)) {
-        global.signers.push(accountName)
+        if (publicKey === source) global.signers.unshift(accountName)
+        else global.signers.push(accountName)
       } else {
         accountNode.disabled = true
       }
@@ -302,17 +319,17 @@ async function parseQuery (query) {
     if (global.signers.length === 0) {
       accountSelector.selectedIndex = -1
       refreshPublicKey()
-      loadingMsg.destroy()
-      parseQuery(query)
-      new Notification('warning', 'No legit signer for this transaction')
+      global.cosmicLink.user = null
+      new Notification('warning', 'No signer for this transaction',
+        "There's no legit signer for this transaction among your accounts."
+      )
       return
     }
 
-    if (!global.signers.find(entry => entry === account)) {
+    if (! global.signers.find(entry => entry === account)) {
       accountSelector.value = global.signers[0]
       refreshPublicKey()
-      loadingMsg.destroy()
-      parseQuery(query)
+      global.cosmicLink.user = publicKeyNode.value
       return
     }
   } else {
@@ -320,21 +337,6 @@ async function parseQuery (query) {
       const accountName = global.db.accountName(signer.value, network)
       if (accountName) global.signers.push(accountName)
     })
-  }
-
-  let exist = await accountExist(publicKey, network)
-  loadingMsg.destroy()
-  if (currentAccount() !== account) return
-
-  if (!exist) {
-    if (network !== 'test') {
-      new Notification('warning', 'Empty account')
-      xdrBox.placeholder = "Can't compute transaction for empty account"
-      return
-    }
-    await fundTestAccount(publicKey)
-    parseQuery(query)
-    return
   }
 }
 
