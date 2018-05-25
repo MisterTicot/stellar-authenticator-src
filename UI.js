@@ -281,28 +281,6 @@ async function parseQuery (query) {
 
   global.cosmicLink = new CosmicLink(query, network, publicKey)
   const tdesc = await global.cosmicLink.getTdesc()
-
-  /// Display transaction URI
-  if (query.substr(0, 1) === '?') {
-    try {
-      const uri = await global.cosmicLink.getUri()
-      uriBox.value = uri
-    } catch (error) {
-      uriBox.value = 'https://cosmic.link/' + query
-    }
-  } else uriBox.value = query
-
-  /// No account selected in the UI
-  if (!account) {
-    if (tdesc.source) {
-      try { xdrBox.value = await global.cosmicLink.getXdr() }
-      catch (error) { xdrBox.placeholder = error.message }
-    } else {
-      xdrBox.placeholder = 'No source account selected'
-    }
-    return
-  }
-
   const loadingMsg = new Notification('loading', 'Loading account...')
 
   /// Find legit signers
@@ -358,16 +336,30 @@ async function parseQuery (query) {
     parseQuery(query)
     return
   }
-
-  try {
-    const xdr = await global.cosmicLink.getXdr()
-    if (currentAccount() !== account) return
-    xdrBox.value = xdr
-    signingButton.disabled = false
-  } catch (error) {
-    xdrBox.placeholder = error.message
-  }
 }
+
+CosmicLink.addFormatHandler('xdr', event => {
+  if (event.cosmicLink !== global.cosmicLink) return
+  if (event.value) {
+    xdrBox.value = event.value
+    if (global.signers.length) signingButton.disabled = false
+  } else {
+    xdrBox.placeholder = event.error.message
+  }
+})
+
+CosmicLink.addFormatHandler('uri', event => {
+  if (event.cosmicLink !== global.cosmicLink) return
+  if (event.value) uriBox.value = event.value
+  else uriBox.placeholder = event.error.message
+})
+
+CosmicLink.addFormatHandler('query', event => {
+  if (event.cosmicLink !== global.cosmicLink) return
+  if (event.value) history.replaceState(null, '', event.value)
+  else console.log(event.error)
+})
+
 
 function fundTestAccount (publicKey) {
   return new Promise(function (resolve, reject) {
