@@ -230,8 +230,8 @@ export class Database {
   accountName (publicKey, network) {
     for (let account in this.accounts) {
       if (
-        this.accounts[account].id === publicKey
-        && this.accounts[account].network === network
+        this.accounts[account].id === publicKey &&
+        this.accounts[account].network === network
       ) {
         return account
       }

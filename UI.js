@@ -278,7 +278,7 @@ const openXdrForm = new Form(node.grab('#openXdr'))
 const xdrStripSourceNode = node.grab('#xdrStripSource')
 const xdrStripSequenceNode = node.grab('#xdrStripSequence')
 const xdrStripSignaturesNode = node.grab('#xdrStripSignatures')
-export function openXdrOption(element) {
+export function openXdrOption (element) {
   if (element.checked) {
     xdrStripSourceNode.checked = false
     xdrStripSequenceNode.checked = false
@@ -297,7 +297,7 @@ async function parseQuery (query) {
   const publicKey = account && global.db.publicKey(account)
 
   global.cosmicLink = new CosmicLink(query, network, publicKey)
-  if (! account) return
+  if (!account) return
 
   /// Check if account exists.
   const loadingMsg = new Notification('loading', 'Loading account...')
@@ -343,11 +343,10 @@ async function parseQuery (query) {
       return
     }
 
-    if (! global.signers.find(entry => entry === account)) {
+    if (!global.signers.find(entry => entry === account)) {
       accountSelector.value = global.signers[0]
       refreshPublicKey()
       global.cosmicLink.user = publicKeyNode.value
-      return
     }
   } else {
     signers.forEach(signer => {
@@ -378,7 +377,6 @@ CosmicLink.addFormatHandler('query', event => {
   if (event.value) history.replaceState(null, '', event.value)
   else console.log(event.error)
 })
-
 
 function fundTestAccount (publicKey) {
   return new Promise(function (resolve, reject) {
@@ -434,7 +432,7 @@ export function signAndSend () {
       new Notification('warning', 'Transaction rejected', error)
     }
     message2.destroy()
-    })
+  })
 }
 
 export function closeTransaction () {
@@ -459,9 +457,9 @@ export function pushQuery (query) {
 
 export function popQuery () {
   if (
-    global.history === history.length
-    && global.history !== 2
-    && !document.referrer
+    global.history === history.length &&
+    global.history !== 2 &&
+    !document.referrer
   ) {
     history.replaceState(null, '', '?')
     handleQuery()
@@ -783,5 +781,3 @@ function about () {
   selectPage(aboutPage)
   node.hide(aboutLinkNode)
 }
-
-
