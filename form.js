@@ -13,7 +13,6 @@ export class Form {
 
       for (let index in this.node.childNodes) {
         const child = this.node.childNodes[index]
-        if (child.tagName === 'INPUT') child.required = true
         if (child.name) this.inputs[child.name] = child
         if (child.className === 'info') this.infoNode = child
       }

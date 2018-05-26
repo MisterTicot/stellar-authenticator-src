@@ -162,6 +162,7 @@ textarea, select
 
 [type="checkbox"] + label
 {
+    margin: 0;
     background-color: white;
     font-style: italic;
     color: dimgrey;

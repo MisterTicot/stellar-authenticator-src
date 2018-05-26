@@ -260,9 +260,14 @@ const openUriForm = new Form(node.grab('#openUri'))
 const openXdrForm = new Form(node.grab('#openXdr'))
   .addValidator(() => {
     try {
-      const xdr = openXdrForm.inputs.xdr.value
+      const inputs = openXdrForm.inputs
+      const xdr = inputs.xdr.value
       new StellarSdk.Transaction(xdr)
-      pushQuery('?xdr=' + xdr)
+      let query = '?xdr=' + xdr
+      if (inputs.stripSource.checked) query += '&stripSource'
+      else if (inputs.stripSequence.checked) query += '&stripSequence'
+      else if (inputs.stripSignatures.checked) query += '&stripSignatures'
+      pushQuery(query)
       openXdrForm.reset()
     } catch (error) {
       console.log(error)
@@ -270,9 +275,21 @@ const openXdrForm = new Form(node.grab('#openXdr'))
     }
   })
 
+const xdrStripSourceNode = node.grab('#xdrStripSource')
+const xdrStripSequenceNode = node.grab('#xdrStripSequence')
+const xdrStripSignaturesNode = node.grab('#xdrStripSignatures')
+export function openXdrOption(element) {
+  if (element.checked) {
+    xdrStripSourceNode.checked = false
+    xdrStripSequenceNode.checked = false
+    xdrStripSignaturesNode.checked = false
+    element.checked = true
+  }
+}
+
 /** ***************************** Read transaction *****************************/
 
-const transactionNode = node.grab('#CL_transactionNode')
+const transactionNode = node.grab('#CL_htmlNode')
 
 async function parseQuery (query) {
   const account = currentAccount()
