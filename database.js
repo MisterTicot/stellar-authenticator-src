@@ -48,6 +48,7 @@ export class Database {
     this.salt = salt
     this.table = table
     this.protocol = protocol
+    refreshAliases(this)
     localStorage.login = true
     delete localStorage.login
   }
@@ -166,6 +167,7 @@ export class Database {
     const seedsKey = await this.seedsKey(password)
     const encryptedSeed = await encryptString(seed, seedsKey)
     this.accounts[name] = { id: publicKey, seed: encryptedSeed, network: network }
+    refreshAliases(this)
     await this.save()
   }
 
@@ -178,13 +180,13 @@ export class Database {
     this.checkAccountExist(name)
     await this.checkPassword(password)
     delete this.table.accounts[name]
+    refreshAliases(this)
     await this.save()
   }
 
   /// Retrieve datas
   get accounts () { return this.table.accounts }
-  get contact () { return this.table.contacts }
-  get aliases () { return this.table.accounts.concat(this.table.contacts) }
+  get contacts () { return this.table.contacts }
   get version () { return this.table.version }
 
   static listUsers () {
@@ -257,6 +259,7 @@ export class Database {
     const publicKey = seedToPublicKey(seed)
     const encryptedSeed = await encryptString(seed, seedsKey)
     this.accounts[name] = { id: publicKey, seed: encryptedSeed, network: network }
+    refreshAliases(this)
     this.save()
   }
 
@@ -308,6 +311,26 @@ function seedToPublicKey (seed) {
     console.log(error)
     throw new Error('Invalid secret seed')
   }
+}
+
+function refreshAliases (database) {
+  const aliases = {}
+  Object.defineProperty(database, 'aliases', {
+    configurable: true,
+    get: function () {
+      if (!aliases.length) {
+        for (let contact in database.table.contacts) {
+          const publicKey = database.table.contacts[contact].id
+          if (publicKey) aliases[publicKey] = contact
+        }
+        for (let account in database.table.accounts) {
+          const publicKey = database.table.accounts[account].id
+          aliases[publicKey] = account
+        }
+      }
+      return aliases
+    }
+  })
 }
 
 function sortCI (array) {

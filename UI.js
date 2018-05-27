@@ -297,6 +297,7 @@ async function parseQuery (query) {
   const publicKey = account && global.db.publicKey(account)
 
   global.cosmicLink = new CosmicLink(query, network, publicKey)
+  global.cosmicLink.addAliases(global.db.aliases)
   if (!account) return
 
   /// Check if account exists.
