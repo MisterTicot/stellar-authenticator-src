@@ -22,8 +22,7 @@ export function readFile (file) {
 }
 
 export async function copyContent (element) {
-  node.copyContent(element)
-  if (document.activeElement.value) {
+  if (node.copyContent(element) && document.activeElement.value) {
     const prevNode = node.grab('#copied')
     if (prevNode) node.destroy(prevNode)
     const copiedNode = node.create('span', '#copied', 'Copied')
