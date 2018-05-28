@@ -316,8 +316,14 @@ async function parseQuery (query) {
   }
 
   /// Find legit signers
-  const tdesc = await global.cosmicLink.getTdesc()
-  const signers = await global.cosmicLink.getSigners()
+  let tdesc, signers
+  try {
+    tdesc = await global.cosmicLink.getTdesc()
+    signers = await global.cosmicLink.getSigners()
+  } catch (error) {
+    console.log(error)
+    return
+  }
   global.signers = []
   if (tdesc.source) {
     for (let index in accountSelector.childNodes) {
@@ -355,16 +361,19 @@ async function parseQuery (query) {
       if (accountName) global.signers.push(accountName)
     })
   }
+
+  try {
+    await global.cosmicLink.getXdr()
+    if (global.signers.length) signingButton.disabled = false
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 CosmicLink.addFormatHandler('xdr', event => {
   if (event.cosmicLink !== global.cosmicLink) return
-  if (event.value) {
-    xdrBox.value = event.value
-    if (global.signers.length) signingButton.disabled = false
-  } else {
-    xdrBox.placeholder = event.error.message
-  }
+  if (event.value) xdrBox.value = event.value
+  else xdrBox.placeholder = event.error.message
 })
 
 CosmicLink.addFormatHandler('uri', event => {
