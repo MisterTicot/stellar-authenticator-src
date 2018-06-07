@@ -16,8 +16,6 @@ Later:
 
 
 Not included there but to be implemented via cosmic-lib:
-* Multi-operation transactions
-* Multi-signature handling
 * Ledger nano S support
 * 2-FA with StellarGuard
 * Support DKIF protocol
