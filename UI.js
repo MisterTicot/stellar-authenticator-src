@@ -468,7 +468,6 @@ export function pushQuery (query) {
 export function popQuery () {
   if (
     global.history === history.length &&
-    global.history !== 2 &&
     !document.referrer
   ) {
     history.replaceState(null, '', '?')
