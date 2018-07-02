@@ -1,5 +1,5 @@
 const ROOT = location.protocol + '//' + location.host + '/'
-const VERSION = '0.1.26'
+const VERSION = '0.1.27'
 const CACHE_NAME = VERSION + ':cache'
 const CACHE_FILES = [
   '/',
@@ -33,15 +33,24 @@ self.addEventListener('activate', function (event) {
 
 self.addEventListener('fetch', function (event) {
   if (event.request.method !== 'GET') return
+
+  let request = event.request
   const filename = event.request.url.replace(ROOT, '').replace(/\?.*$/, '')
-  if (filename && CACHE_FILES.indexOf(filename) === -1) return
+
+  if (!filename || filename === 'index.html') {
+    /// Strip out query string from request.
+    request = new Request(ROOT + filename)
+  } else if (CACHE_FILES.indexOf(filename) === -1) {
+    /// The asset is not managed by the service worker.
+    return
+  }
 
   console.log('Fetching resource: ' + filename + '...')
 
   event.respondWith(
-    caches.match(event.request)
+    caches.match(request)
       .then(function (cached) {
-        const networked = fetch(event.request)
+        const networked = fetch(request)
           .then(fetchedFromNetwork)
           .catch(console.error)
         return cached || networked
@@ -49,7 +58,7 @@ self.addEventListener('fetch', function (event) {
         function fetchedFromNetwork (response) {
           const cacheCopy = response.clone()
           caches.open(CACHE_NAME)
-            .then(cache => cache.put(event.request, cacheCopy))
+            .then(cache => cache.put(request, cacheCopy))
             .catch(console.error)
           return response
         }
