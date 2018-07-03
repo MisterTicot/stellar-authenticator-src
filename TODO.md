@@ -1,6 +1,5 @@
 Before stable release (planned for this autumn):
 * Have a native english speaker check all the texts
-* Implement as a progressive app
 * Cloud backup
 * Signing datas capabilities
 * Better address information interface
