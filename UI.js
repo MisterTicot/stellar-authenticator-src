@@ -7,6 +7,8 @@ import {download, readFile} from './helpers'
 
 import * as node from './cosmic-lib/node'
 
+/** Global variables **/
+
 const global = {
   cosmicLink: null,
   db: null,
@@ -14,7 +16,7 @@ const global = {
   history: history.length
 }
 
-/** * helpers ***/
+/** helpers ***/
 const publicServer = new StellarSdk.Server('https://horizon.stellar.org')
 const testingServer = new StellarSdk.Server('https://horizon-testnet.stellar.org')
 
@@ -35,6 +37,22 @@ async function accountExist (publicKey, network) {
     return false
   }
 }
+
+/** Install button **/
+let deferredPrompt
+const installAppButton = node.grab('#installApp')
+
+window.addEventListener('beforeinstallprompt', function (event) {
+  event.preventDefault()
+  deferredPrompt = event
+  node.show(installAppButton)
+})
+
+installAppButton.addEventListener('click', function (event) {
+  node.hide(installAppButton)
+  deferredPrompt.prompt()
+  deferredPrompt = undefined
+})
 
 /** ************************* Login in *****************************************/
 
