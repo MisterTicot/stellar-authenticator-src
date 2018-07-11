@@ -443,9 +443,10 @@ export function signAndSend () {
   popup.addValidator(async password => {
     await popup.setInfo('Signing transaction...')
 
-    const seeds = await global.db.secretSeed(password, ...global.signers)
-    if (typeof seeds === 'string') await global.cosmicLink.sign(seeds)
-    else for (let index in seeds) await global.cosmicLink.sign(seeds[index])
+    const keypairs = await global.db.keypair(password, ...global.signers)
+    if (global.signers.length === 1) await global.cosmicLink.sign(keypairs)
+    else await global.cosmicLink.sign(...keypairs)
+
     signingButton.disabled = true
 
     popup.destroy()
