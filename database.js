@@ -214,17 +214,24 @@ export class Database {
     else return seeds
   }
 
-  async keypair (password, name = this.current) {
-    const secretSeed = await this.secretSeed(password, name)
-    return StellarSdk.Keypair.fromSecret(secretSeed)
+  async keypair (password, ...names) {
+    const secretSeeds = await this.secretSeed(password, ...names)
+    if (names.length === 1) {
+      return StellarSdk.Keypair.fromSecret(secretSeeds)
+    } else {
+      const keypairs = secretSeeds.map(entry => {
+        return StellarSdk.Keypair.fromSecret(entry)
+      })
+      return keypairs
+    }
   }
 
-  publicKey (name = this.current) {
+  publicKey (name) {
     this.checkAccountExist(name)
     return this.accounts[name].id
   }
 
-  network (name = this.current) {
+  network (name) {
     this.checkAccountExist(name)
     return this.accounts[name].network
   }
