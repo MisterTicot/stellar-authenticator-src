@@ -1,3 +1,4 @@
+import cosmicLib from './cosmic-lib'
 import {CosmicLink} from './cosmic-lib'
 import {Form} from './form'
 import {Popup, passwordPopup} from './popup'
@@ -314,7 +315,7 @@ async function parseQuery (query) {
   const network = account && global.db.network(account)
   const publicKey = account && global.db.publicKey(account)
 
-  global.cosmicLink = new CosmicLink(query, network, publicKey)
+  global.cosmicLink = new CosmicLink(query, { network: network, user: publicKey })
   global.cosmicLink.addAliases(global.db.aliases)
   if (!account) return
 
@@ -361,7 +362,6 @@ async function parseQuery (query) {
     if (global.signers.length === 0) {
       accountSelector.selectedIndex = -1
       refreshPublicKey()
-      global.cosmicLink.user = null
       new Notification('warning', 'No signer for this transaction',
         "There's no legit signer for this transaction among your accounts."
       )
@@ -371,7 +371,6 @@ async function parseQuery (query) {
     if (!global.signers.find(entry => entry === account)) {
       accountSelector.value = global.signers[0]
       refreshPublicKey()
-      global.cosmicLink.user = publicKeyNode.value
     }
   } else {
     signers.forEach(signer => {
@@ -388,19 +387,19 @@ async function parseQuery (query) {
   }
 }
 
-CosmicLink.addFormatHandler('xdr', event => {
+cosmicLib.defaults.addFormatHandler('xdr', event => {
   if (event.cosmicLink !== global.cosmicLink) return
   if (event.value) xdrBox.value = event.value
   else xdrBox.placeholder = event.error.message
 })
 
-CosmicLink.addFormatHandler('uri', event => {
+cosmicLib.defaults.addFormatHandler('uri', event => {
   if (event.cosmicLink !== global.cosmicLink) return
   if (event.value) uriBox.value = event.value
   else uriBox.placeholder = event.error.message
 })
 
-CosmicLink.addFormatHandler('query', event => {
+cosmicLib.defaults.addFormatHandler('query', event => {
   if (event.cosmicLink !== global.cosmicLink) return
   if (event.value) history.replaceState(null, '', event.value)
   else console.log(event.error)
