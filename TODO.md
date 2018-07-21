@@ -4,6 +4,7 @@ Before stable release (planned for this autumn):
 * Signing datas capabilities
 * Better address information interface
 * Offer to define aliases for contacts
+* Make it easier to run the website locally
 * More anti-phishing features
 
 Later:
