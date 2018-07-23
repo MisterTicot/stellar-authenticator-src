@@ -9,11 +9,13 @@
   <meta name="description" content="Safely create and manage your Stellar
     accounts.">
 
-  <link rel="manifest" href="manifest.json">
   <meta name="twitter:card" content="summary">
   <meta name="msapplication-config" content="browserconfig.xml">
   <meta name="msapplication-TileColor" content="#00aba9">
 
+  <meta property="og:title" content="Stellar Authenticator ~ Keep it safe and simple !">
+  <meta property="og:description" content="Safely create and manage your Stellar
+    accounts.">
   <meta property="og:image" content="https://stellar-authenticator.org/icons/192x192.png">
   <meta property="og:image:height" content="192">
   <meta property="og:image:width" content="192">
@@ -26,6 +28,7 @@
   <link rel="mask-icon" href="icons/safari.svg" color="#5bbad5">
 
   <link rel="stylesheet" type="text/css" href="authenticator.css">
+  <link rel="manifest" href="manifest.json">
 </head>
 
 <body id="body" onload="authenticator.init()">
@@ -333,7 +336,7 @@
 
   <footer id="footer">
     <div id="social" style="display:none">
-      <a title="Telegram" target="_blank" rel="noopener" href="https://t.me/stellar-authenticator">
+      <a title="Telegram" target="_blank" rel="noopener" href="https://t.me/stellar_authenticator">
         <svg viewBox="-40 -40 380 380"><path d="M5.299 144.645l69.126 25.8 26.756 86.047c1.712 5.511 8.451 7.548 12.924 3.891l38.532-31.412a11.496 11.496 0 0 1 14.013-.391l69.498 50.457c4.785 3.478 11.564.856 12.764-4.926L299.823 29.22c1.31-6.316-4.896-11.585-10.91-9.259L5.218 129.402c-7.001 2.7-6.94 12.612.081 15.243zm91.57 12.066l135.098-83.207c2.428-1.491 4.926 1.792 2.841 3.726L123.313 180.87a23.112 23.112 0 0 0-7.163 13.829l-3.798 28.146c-.503 3.758-5.782 4.131-6.819.494l-14.607-51.325c-1.673-5.854.765-12.107 5.943-15.303z"/></svg>
       </a>
       <a title="GitHub" target="_blank" rel="noopener" href="https://github.com/MisterTicot/stellar-authenticator">
@@ -345,13 +348,13 @@
       <a title="Email" href="mailto:author@stellar-authenticator.org">
         <svg viewBox="-39 -39 450 450"><path d="M356.92 57.712H15.525C6.986 57.712 0 64.7 0 73.236v225.971c0 8.539 6.986 15.525 15.525 15.525H356.92c8.538 0 15.524-6.986 15.524-15.525V73.236c0-8.537-6.986-15.524-15.524-15.524zM242.954 197.005c28.809 19.424 103.25 77.049 103.25 77.049 2.965 2.009 3.177 7.16 1.693 10.229-1.483 3.07-6.122 4.938-9.087 2.93 0 0-79.24-57.212-109.561-77.969-1.678-1.148-3.164.23-3.164.23l-33.247 26.527c-1.818 1.492-4.215 2.314-6.745 2.314s-4.926-.822-6.746-2.314l-33.629-26.838s-1.158-1.009-2.475-.096c-29.972 20.805-108.867 78.145-108.867 78.145-2.964 2.009-8.604.141-10.087-2.93-1.483-3.068-1.271-8.22 1.693-10.229 0 0 74.535-57.445 102.884-76.768 1.619-1.104-.08-2.727-.08-2.727L23.662 99.908c-3.822-3.133-4.966-8.744-2.605-12.775 1.402-2.398 3.872-3.83 6.604-3.83 1.924 0 3.865.723 5.466 2.035l149.502 131.025c.883.723 2.145 1.139 3.464 1.139s2.581-.416 3.465-1.139L339.059 85.338c1.601-1.313 3.542-2.035 5.467-2.035 2.732 0 5.201 1.432 6.604 3.83 2.36 4.031 1.216 9.643-2.604 12.775l-105.404 94.945c-.001.001-1.486 1.261-.168 2.152z"/></svg>
       </a>
-      <a title="About" onclick="authenticator.pushQuery('?about')">
+      <a id="aboutIcon" title="About" onclick="authenticator.pushQuery('?about')">
         <svg viewBox="-4 -4 40 40"><path d="M10 16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8v4h16v-4h-1.992c-1.102 0-2-.895-2-2L20 12H8v4h2z"/><circle cx="16" cy="4" r="4"/></svg>
       </a>
     </div>
     <div id="disclaimer">
-      <p>Stellar Authenticator is a free software under MIT licence</p>
-      <p>This service is independent from the Stellar Foundation</p>
+      <p>Stellar Authenticator is a free software under MIT licence.</p>
+      <p>This service is independent from the Stellar Foundation.</p>
     </div>
   </footer>
 

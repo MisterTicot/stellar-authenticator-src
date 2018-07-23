@@ -748,6 +748,7 @@ const titleNode = node.grab('#title')
 const accountsNode = node.grab('#accounts')
 const disclaimerNode = node.grab('#disclaimer')
 const socialIcons = node.grab('#social')
+const aboutIcon = node.grab("#aboutIcon")
 
 const aboutPage = node.grab('#about')
 
@@ -798,14 +799,16 @@ function footerShowDisclaimer () {
   node.show(disclaimerNode)
 }
 
+const openAboutPage = () => { pushQuery('?about') }
 function footerShowAbout () {
   node.hide(disclaimerNode)
   node.show(socialIcons)
+  aboutIcon.onclick = openAboutPage
 }
 
 function about () {
   headerShowTitle()
   hideMessages()
   selectPage(aboutPage)
-  node.hide(socialIcons)
+  aboutIcon.onclick = null
 }
