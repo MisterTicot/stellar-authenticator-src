@@ -747,7 +747,7 @@ export function logout () {
 const titleNode = node.grab('#title')
 const accountsNode = node.grab('#accounts')
 const disclaimerNode = node.grab('#disclaimer')
-const aboutLinkNode = node.grab('#aboutLink')
+const socialIcons = node.grab('#social')
 
 const aboutPage = node.grab('#about')
 
@@ -794,18 +794,18 @@ function clearMessages () {
 }
 
 function footerShowDisclaimer () {
-  node.hide(aboutLinkNode)
+  node.hide(socialIcons)
   node.show(disclaimerNode)
 }
 
 function footerShowAbout () {
   node.hide(disclaimerNode)
-  node.show(aboutLinkNode)
+  node.show(socialIcons)
 }
 
 function about () {
   headerShowTitle()
   hideMessages()
   selectPage(aboutPage)
-  node.hide(aboutLinkNode)
+  node.hide(socialIcons)
 }

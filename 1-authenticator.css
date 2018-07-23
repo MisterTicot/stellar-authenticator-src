@@ -18,10 +18,13 @@ html
 
 body
 {
+    box-sizing: border-box;
+    position: relative;
     width: 100%;
+    min-height: 100%;
+    padding: 3.5em 0;
     background-color: aliceblue;
     font-family: "Trebuchet MS", Helvetica, sans-serif;
-    padding-bottom: 0.5em;
     font-size: 1.2em;
 }
 
@@ -51,11 +54,11 @@ h1
 noscript, main
 {
     max-width: 40em;
-    background-color: white;
-    margin: 3.3em auto 1em auto;
+    margin: auto;
     box-shadow: 0.1em 0.1em 0.1em darkgrey;
     border: 0.1em solid lightgrey;
     border-radius: 0.1em;
+    background-color: white;
     padding: 0.5em;
     overflow: auto;
 }
@@ -433,4 +436,39 @@ footer #disclaimer
     padding: 0.05em 0.5em;
     font-weight: bold;
     color: mediumseagreen;
+}
+
+/*** Social icons ***/
+#social
+{
+    position: absolute;
+    bottom: 0.5em;
+    right: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+}
+
+#social a
+{
+    display: inline-block;
+}
+
+#social svg
+{
+    width: 2.5em;
+    height: 2.5em;
+    margin: 0 0.5em;
+    border-radius: 25%;
+    background: ghostwhite;
+    fill: grey;
+    box-shadow: 0.1em 0.1em 0.3em darkgrey;
+    transition: all 0.3s ease;
+}
+
+#social a:hover svg
+{
+    background: lightblue;
+    fill: dimgrey;
+    box-shadow: 0.1em 0.1em 0.3em dimgrey;
 }
