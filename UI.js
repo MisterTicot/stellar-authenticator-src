@@ -453,8 +453,9 @@ export function signAndSend () {
     top()
     const message2 = new Notification('loading', 'Sending transaction...')
     try {
-      await global.cosmicLink.send()
-      new Notification('done', 'Transaction validated')
+      const response = await global.cosmicLink.send()
+      if (!response.stellarGuard) new Notification('done', 'Transaction validated')
+      else new Notification('done', 'Transaction submitted to Stellar Guard')
     } catch (error) {
       console.log(error)
       new Notification('warning', 'Transaction rejected', error)
