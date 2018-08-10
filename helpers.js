@@ -25,8 +25,8 @@ export async function copyContent (element) {
   if (node.copyContent(element) && document.activeElement.value) {
     const prevNode = node.grab('#copied')
     if (prevNode) node.destroy(prevNode)
-    const copiedNode = node.create('span', '#copied', 'Copied')
+    const copiedNode = node.create('div', '#copied', 'Copied')
     element.parentNode.insertBefore(copiedNode, element.nextSibling)
-    setTimeout(() => { copiedNode.hidden = true }, 3000)
+    setTimeout(() => { copiedNode.style.opacity = 0 }, 3000)
   }
 }

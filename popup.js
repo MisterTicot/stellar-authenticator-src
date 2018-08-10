@@ -8,8 +8,9 @@ const headerNode = node.grab('header')
 const shadowNode = node.create('div', '#shadow')
 bodyNode.insertBefore(shadowNode, bodyNode.firstChild)
 
-export function passwordPopup (username, message = 'Please confirm this operation') {
-  const popup = new Popup(message)
+export function passwordPopup (username, title = 'Please confirm this operation', message) {
+  const popup = new Popup(title)
+  if (message) popup.addMessage(message).addSeparator()
   popup.putInfoNode()
     .addPasswordConfirmation(username)
     .addValidator(() => popup.inputs.password.value)
@@ -20,10 +21,10 @@ export class Popup {
   constructor (title, noShadow) { return createPopup(title, noShadow) }
 }
 
-function createPopup (content, noShadow) {
+function createPopup (title, noShadow) {
   const popup = new Form()
   popup.window = node.create('div', '.popup', popup.node)
-  popup.addNode('', content).addSeparator().putInfoNode()
+  popup.addNode('', node.create('h3', null, title)).addSeparator().putInfoNode()
   node.append(bodyNode, popup.window)
 
   if (!noShadow) popup.shadow = true
@@ -79,5 +80,6 @@ function addCloseButton (popup) {
 
 function addCancelConfirmButtons (popup) {
   popup.addButton('cancel', '✘ Cancel', popup.onExit)
+    .addNode('', node.create('div', '.padding', ' '))
     .addSubmit().select()
 }

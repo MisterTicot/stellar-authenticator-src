@@ -119,13 +119,13 @@ export class Form {
   addFileSelector (name, text) {
     const button = addInput(this, '', 'button')
     const file = addInput(this, name, 'file')
-    const message = node.create('span', null, 'No file selected')
-    this.addMessage(message)
+    const label = node.create('label', null, 'No file selected')
+    this.addNode('', label)
     node.hide(file)
     button.value = text
     button.onclick = () => file.click()
     button.style.float = 'left'
-    file.onchange = () => { message.textContent = file.value.replace(/^.*\\/, '') }
+    file.onchange = () => { label.textContent = file.value.replace(/^.*\\/, '') }
     return this
   }
   addTextArea (name, placeHolder, rows) {

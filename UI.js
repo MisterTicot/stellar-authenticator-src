@@ -599,12 +599,9 @@ export function showSecret () {
   const account = currentAccount()
   if (!account) return
   const popup = passwordPopup(global.db.username,
-    node.create('div', null,
-      'Show secret seed for: ' + account,
-      node.create('hr'),
-      `Your secret seed offer full control over your account and should never be
-      given away.`
-    ))
+    'Show secret seed for: ' + account,
+    'Your secret seed offer full control over your account and should never be given away.'
+  )
 
   popup.addValidator(async password => {
     await popup.setInfo('Decrypting secret seed...')
@@ -632,13 +629,11 @@ export function removeAccount () {
   if (!account) return
 
   const popup = passwordPopup(global.db.username,
-    node.create('div', null,
-      'Remove account: ' + account,
-      node.create('hr'),
-      `You're about to remove this account from this device. Please make sure
-      that you have an alternative way to access it, or that there's no more
-      funds on it.`
-    ))
+    'Remove account: ' + account,
+    `You're about to remove this account from this device. Please make sure
+    that you have an alternative way to access it, or that there's no more
+    funds on it.`
+  )
 
   popup.addValidator(async password => {
     await popup.setInfo('Removing account...')
@@ -715,13 +710,11 @@ export function passwordChange () {
 
 export function removeUser (password) {
   const popup = passwordPopup(global.db.username,
-    node.create('div', null,
-      'Remove user: ' + global.db.username,
-      node.create('hr'),
-      `You're about to remove this profile and all associated accounts from
-      this device. Please make sure that you have an alternative way to access
-      them, or that there's no more funds on them.`
-    ))
+    'Remove user: ' + global.db.username,
+    `You're about to remove this profile and all associated accounts from
+    this device. Please make sure that you have an alternative way to access
+    them, or that there's no more funds on them.`
+  )
 
   popup.addValidator(async password => {
     await popup.setInfo('Deleting account...')
