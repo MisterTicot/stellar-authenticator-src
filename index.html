@@ -43,9 +43,7 @@
   </header>
 
   <div id="loading" class="popup" style="display:none">
-    <hr>
-      Loading...
-    <hr>
+    <h3>Loading</h3>
   </div>
   <script>document.getElementById("loading").style.display = "block"</script>
 
@@ -84,8 +82,7 @@
     <p>
       If you prefer to learn more about Stellar first, you can take a look at the
       official website, at
-      <a href="https://stellar.org" target="_blank" rel="noopener">stellar.org</a>
-      .
+      <a href="https://stellar.org" target="_blank" rel="noopener">stellar.org</a>.
     </p>
 
     <hr>
@@ -135,7 +132,7 @@
 
   <div id="readTransaction" class="page">
     <h2>Transaction</h2>
-    <div id="CL_htmlNode"></div>
+    <p id="CL_htmlNode"></p>
 
     <hr>
 
@@ -184,7 +181,7 @@
     means to go ahead and implement my own solution, thanks to Stellar
     Foundation kind support. </p>
 
-    <h3> What I'm solving </h3>
+    <h3> What is getting solved </h3>
 
     <p> I've created Stellar Authenticator and cosmic links in an effort to
     bring additional security into the Stellar ecosystem. Precisely, I aimed to
@@ -218,7 +215,6 @@
     </ul>
 
     <h3> Design </h3>
-
     <p> After talking with other community members, the solution came up of
     expressing Stellar transaction requests as URL queries. That would be the
     common language between all services/wallets. The
@@ -232,33 +228,30 @@
     it secure and well-functioning. </p>
 
     <h3> Future </h3>
-
     <p> Nowaday, this design is fully implemented and functional. This is still
     in the beta phase, though. This means that it's stable enough to be used
     and the core features have been tested enough. However, some additional
     features are still to be implemented before I can say to job is done.
     Namely cloud syncing, hardware wallets support, encrypted paper wallet, a
-    better support for multi-signatures accounts and transaslation in other
+    better support for multi-signatures accounts and translation into other
     languages. </p>
-
-    <h3> Licence </h3>
-
-    <p>Stellar Authenticator is under <a target="_blank" rel="noopener"
-      href="https://en.wikipedia.org/wiki/MIT_License">MIT Licence</a>. This is
-    a free software licence that allows you to read, copy, edit and distribute
-    the code with or without your changes. The development costs are supported
-    by the Stellar Foundation and the donators.</p>
 
     <h3> Source Code </h3>
     <p>
       The Gihub repository is at <a target="_blank" rel="noopener"
       href="https://github.com/MisterTicot/stellar-authenticator">
       https://github.com/MisterTicot/stellar-authenticator</a>. This website is
-      served directly from there.
+      served directly from there through CloudFlare.
     </p>
 
-    <h3> Contact </h3>
+    <h3> Licence </h3>
+    <p>Stellar Authenticator is under <a target="_blank" rel="noopener"
+      href="https://en.wikipedia.org/wiki/MIT_License">MIT Licence</a>. This is
+    a free software licence that allows you to read, copy, edit and distribute
+    the code with or without your changes. The development costs are supported
+    by the Stellar Foundation and the donators.</p>
 
+    <h3> Contact </h3>
     <p>
       If you wish to contribute, ask a question or make a suggestion, you're
       welcome to do so in the <a target="_blank" rel="noopener"
@@ -270,11 +263,9 @@
     </p>
 
     <h3> Donate </h3>
-
     <p> Tips are welcome at
       <a onclick="authenticator.pushQuery('?payment&amount=20&destination=donate*stellar-authenticator.org')">
-        donate*stellar-authenticator.org
-      </a>.
+        donate*stellar-authenticator.org</a>.
     </p>
 
     <hr>
@@ -316,7 +307,7 @@
       <input type="button" id="removeAccount" value="Remove account" onclick="authenticator.removeAccount()">
     </div>
 
-    <h3 onclick="authenticator.showSetting(this)">Add account</h3>
+    <h3 onclick="authenticator.showSetting(this)">Add Account</h3>
     <div>
       <input type="button" value="Import secret seed" onclick="authenticator.importSeed()">
       <input type="button" value="Create new account" onclick="authenticator.newAccount()">
