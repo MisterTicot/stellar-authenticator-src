@@ -16,10 +16,10 @@ function shareSessionStorage (event) {
     const data = JSON.parse(event.newValue)
     sessionStorage.username = data.username
     sessionStorage.userkey = data.userkey
-  } else if (event.key.substr(-9) === '_database' || event.key === 'logout') {
+  } else if (!document.hasFocus() && (event.key.substr(-9) === '_database' || event.key === 'logout')) {
     sessionStorage.clear()
     location.reload()
-  } else if (event.key === 'login' && !sessionStorage.length) {
+  } else if (!document.hasFocus() && event.key === 'login' && !sessionStorage.length) {
     location.reload()
   }
 }
