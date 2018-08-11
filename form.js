@@ -3,6 +3,7 @@ import {timeout} from './cosmic-lib/helpers'
 
 export class Form {
   constructor (element) {
+    this.isForm = true
     this.inputs = {}
     this.validators = []
 
@@ -89,6 +90,7 @@ export class Form {
   }
   addPasswordBox (name, placeholder = 'Authenticator password') {
     const box = addInput(this, name, 'password')
+    if (sessionStorage.password) box.value = sessionStorage.password
     box.placeholder = placeholder
     return this
   }
@@ -147,12 +149,8 @@ export class Form {
     const element = this.firstInput
     if (element) element.focus()
     if (element.name === 'password') {
-      timeout(30).then(() => {
-        if (element.value !== '') {
-          const next = element.nextSibling
-          if (next.name && next.name !== 'cancel') next.focus()
-          else if (this.inputs.submit) this.inputs.submit.focus()
-        }
+      timeout(100).then(() => {
+        if (element.value !== '') element.nextSibling.focus()
       })
     }
     return this

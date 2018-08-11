@@ -49,8 +49,8 @@
 
   <main style="display:none">
     <div id="messages">
-      <div id="password"></div>
       <div id="notifications"></div>
+      <div id="password"></div>
     </div>
   </main>
 
@@ -74,7 +74,7 @@
 
     <p>
       If you only want to see how Stellar Authenticator works, you can try the
-      <a onclick="authenticator.demoVersion()">demo version</a>.  Please remember that
+      <a onclick="authenticator.guestMode()">guest mode</a>.  Please remember that
       there's not much to do in there, as it is merely an authenticator for
       external Stellar services.
     <p>
@@ -87,12 +87,13 @@
 
     <hr>
 
-    <form>
-      <a onclick="authenticator.newUser()">New user</a>
+    <form id="loginOptions">
+      <span class="info"></span>
+      <a onclick="authenticator.newUser()">New User</a>
       |
-      <a onclick="authenticator.importUser()">Import user</a>
+      <a onclick="authenticator.importUser()">Import User</a>
       |
-      <a onclick="authenticator.demoVersion()">Demo</a>
+      <a onclick="authenticator.guestMode()">Guest Mode</a>
     </form>
   </div>
 

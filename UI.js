@@ -5,6 +5,7 @@ import {Popup, passwordPopup} from './popup'
 import {Database} from './database'
 import {Notification} from './notifications'
 import {download, readFile} from './helpers'
+import {makeSalt} from './crypto'
 
 import * as node from './cosmic-lib/node'
 
@@ -109,9 +110,11 @@ function login () {
     .addPasswordBox('password')
     .addSubmit('Open')
     .addSeparator()
-    .addNode('', node.create('a', { onclick: () => newUser(popup) }, 'New user'))
+    .addNode('', node.create('a', { onclick: () => newUser(popup) }, 'New User'))
     .addNode('', ' | ')
-    .addNode('', node.create('a', { onclick: () => importUser(popup) }, 'Import user'))
+    .addNode('', node.create('a', { onclick: () => importUser(popup) }, 'Import User'))
+    .addNode('', ' | ')
+    .addNode('', node.create('a', { onclick: () => guestMode(popup) }, 'Guest Mode'))
     .select()
     .addValidator(async function () {
       await popup.setInfo('Opening your session...')
@@ -205,11 +208,16 @@ export function importUser (loginPopup) {
 }
 
 const passwordNode = node.grab('#password')
+const loginOptions = new Form(node.grab('#loginOptions'))
 
-export async function demoVersion () {
-  global.db = await Database.new('guest', 'demo')
-  await global.db.newAccount('demo', 'guest', 'test')
-  sessionStorage.demo = 'true'
+export async function guestMode (form = loginOptions) {
+  await form.setInfo('Opening guest session...')
+  const password = makeSalt(6)
+  sessionStorage.password = password
+  global.db = await Database.new('guest', password)
+  await global.db.newAccount(password, 'Guest', 'test')
+  if (form.isPopup) form.destroy()
+  else form.reset()
   open()
 }
 
@@ -237,8 +245,10 @@ async function upgrade () {
 function open () {
   headerShowAccounts()
   footerShowAbout()
-  if (sessionStorage.demo) passwordNode.textContent = 'The password is: demo'
   refreshPage()
+
+  /// Show guest mode password
+  if (sessionStorage.password) passwordNode.textContent = sessionStorage.password
 }
 
 function handleQuery () {
@@ -705,7 +715,17 @@ export function passwordChange () {
       if (password2 !== password3) throw new Error('New passwords mismatch')
       await popup.setInfo('Setting new password...')
       await global.db.changePassword(password, password2)
+
+      /// Delete guest mode default password
+      if (sessionStorage.password) {
+        delete sessionStorage.password
+        passwordNode.textContent = ''
+      }
     })
+  
+  /// Prevent those box to be filled in by current password in guest mode.
+  popup.inputs.password2.value = ''
+  popup.inputs.password3.value = ''
 }
 
 export function removeUser (password) {

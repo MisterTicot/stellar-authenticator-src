@@ -23,6 +23,7 @@ export class Popup {
 
 function createPopup (title, noShadow) {
   const popup = new Form()
+  popup.isPopup = true
   popup.window = node.create('div', '.popup', popup.node)
   popup.addNode('', node.create('h3', null, title)).addSeparator().putInfoNode()
   node.append(bodyNode, popup.window)

@@ -383,6 +383,15 @@ header select
     margin: 0.4em;
 }
 
+/* Guest Mode password */
+
+#password
+{
+    float: right;
+    padding-top: 0.5em;
+    font-style: italic;
+    color: grey;
+}
 
 /* Notifications */
 
