@@ -149,7 +149,7 @@ export class Form {
     const element = this.firstInput
     if (element) element.focus()
     if (element.name === 'password') {
-      timeout(100).then(() => {
+      timeout(30).then(() => {
         if (element.value !== '') element.nextSibling.focus()
       })
     }
