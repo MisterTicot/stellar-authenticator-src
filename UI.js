@@ -248,7 +248,7 @@ function open () {
   refreshPage()
 
   /// Show guest mode password
-  if (sessionStorage.password) passwordNode.textContent = sessionStorage.password
+  if (sessionStorage.password) passwordNode.textContent = 'Pass: ' + sessionStorage.password
 }
 
 function handleQuery () {

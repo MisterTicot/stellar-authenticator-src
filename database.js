@@ -16,6 +16,7 @@ function shareSessionStorage (event) {
     const data = JSON.parse(event.newValue)
     sessionStorage.username = data.username
     sessionStorage.userkey = data.userkey
+    if (data.password) sessionStorage.password = data.password
   } else if (!document.hasFocus() && (event.key.substr(-9) === '_database' || event.key === 'logout')) {
     sessionStorage.clear()
     location.reload()

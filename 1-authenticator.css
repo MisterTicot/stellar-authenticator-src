@@ -423,7 +423,7 @@ header select
 {
     position: absolute;
     display: inline-block;
-    transform: translate(-4.1em, 0.3em);
+    transform: translate(-4.1em, 0.29em);
     box-sizing: border-box;
     width: 4em;
     max-height: 1.5em;
@@ -497,6 +497,7 @@ header select
 
 footer p
 {
+    position: relative;
     z-index: -1;
     margin: 0.25em;
 }
