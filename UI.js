@@ -212,7 +212,7 @@ const loginOptions = new Form(node.grab('#loginOptions'))
 
 export async function guestMode (form = loginOptions) {
   await form.setInfo('Opening guest session...')
-  const password = makeSalt(6)
+  const password = makeSalt(3)
   sessionStorage.password = password
   global.db = await Database.new('guest', password)
   await global.db.newAccount(password, 'Guest', 'test')
@@ -248,7 +248,7 @@ function open () {
   refreshPage()
 
   /// Show guest mode password
-  if (sessionStorage.password) passwordNode.textContent = 'Pass: ' + sessionStorage.password
+  if (sessionStorage.password) passwordNode.textContent = 'Password: ' + sessionStorage.password
 }
 
 function handleQuery () {
@@ -722,7 +722,7 @@ export function passwordChange () {
         passwordNode.textContent = ''
       }
     })
-  
+
   /// Prevent those box to be filled in by current password in guest mode.
   popup.inputs.password2.value = ''
   popup.inputs.password3.value = ''
