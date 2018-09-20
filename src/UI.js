@@ -1,5 +1,5 @@
-import cosmicLib from './cosmic-lib'
-import {CosmicLink} from './cosmic-lib'
+import cosmicLib from 'cosmic-lib'
+import {CosmicLink} from 'cosmic-lib'
 import {Form} from './form'
 import {Popup, passwordPopup} from './popup'
 import {Database} from './database'
@@ -7,7 +7,7 @@ import {Notification} from './notifications'
 import {download, readFile} from './helpers'
 import {makeSalt} from './crypto'
 
-import * as node from './cosmic-lib/node'
+import * as node from '@cosmic-plus/jsutils/html'
 
 /** Global variables **/
 

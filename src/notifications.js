@@ -1,5 +1,5 @@
-import * as node from './cosmic-lib/node'
-import {timeout} from './cosmic-lib/helpers'
+import * as node from '@cosmic-plus/jsutils/html'
+import {timeout} from '@cosmic-plus/jsutils/misc'
 
 const notificationsNode = node.grab('#notifications')
 

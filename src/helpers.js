@@ -1,4 +1,4 @@
-import * as node from './cosmic-lib/node.js'
+import * as node from '@cosmic-plus/jsutils/html'
 
 export function download (filename, data) {
   const a = node.create('a', {

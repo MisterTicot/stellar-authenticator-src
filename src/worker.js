@@ -1,12 +1,12 @@
 const ROOT = location.protocol + '//' + location.host + '/'
-const VERSION = '0.1.27'
+const VERSION = '0.1.28'
 const CACHE_NAME = VERSION + ':cache'
 const CACHE_FILES = [
   '/',
   'index.html',
   'authenticator.css',
   'authenticator.js',
-  'bower-js-stellar-sdk/stellar-sdk.min.js'
+  'stellar-sdk.js'
 ]
 
 self.addEventListener('install', function (event) {

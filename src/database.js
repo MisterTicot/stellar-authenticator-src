@@ -1,7 +1,7 @@
 import { deriveKey, encryptString, decryptString, encryptObject, decryptObject,
   makeSalt } from './crypto'
 import {encodeBase64, decodeBase64} from 'tweetnacl-util'
-import {timeout} from './cosmic-lib/helpers'
+import {timeout} from '@cosmic-plus/jsutils/misc'
 
 function shareSessionStorage (event) {
   if (!event.newValue) return

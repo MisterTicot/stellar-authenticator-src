@@ -1,0 +1,51 @@
+{
+  "name": "stellar-authenticator",
+  "version": "0.10.6",
+  "description": "An application to easily & securely sign Stellar transactions",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "standard --fix 'src/**.js'",
+    "get": "git submodule update --init --recursive",
+    "build-css": "cat src/*.css | autoprefixer-cli -o web/authenticator.css",
+    "build-html": "cp -f src/*.html web",
+    "build-js": "webpack -p; cp node_modules/stellar-sdk/dist/stellar-sdk.min.js web/stellar-sdk.js",
+    "build-misc": "cp AUTHORS LICENSE README.md package-lock.json web",
+    "build": "for i in js css html misc; do npm run build-$i || return; done",
+    "check": "npm run get && cp web/package-lock.json . && npm run ci && npm run build && cd web && git status",
+    "watch": "webpack -d --watch",
+    "serve": "npm run watch & cd web && live-server --no-browser"
+  },
+  "keywords": [
+    "cryptocurrency",
+    "stellar",
+    "authenticator",
+    "safe",
+    "wallet"
+  ],
+  "author": "MisterTicot",
+  "license": "MIT",
+  "repository": "github:MisterTicot/stellar-authenticator.git",
+  "browserslist": "last 4 versions, > 0.1%",
+  "devDependencies": {
+    "autoprefixer": "^8.6.5",
+    "autoprefixer-cli": "^1.0.0",
+    "babel-loader": "^7.1.5",
+    "babel-plugin-transform-regenerator": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.7.0",
+    "live-server": "^1.2.0",
+    "postcss-loader": "^2.1.6",
+    "scrypt-async": "^2.0.0",
+    "standard": "^11.0.1",
+    "style-loader": "^0.21.0",
+    "webpack": "^4.17.2",
+    "webpack-cli": "^2.1.5"
+  },
+  "dependencies": {
+    "@cosmic-plus/base": "^1.0.2",
+    "@cosmic-plus/jsutils": "^1.0.0",
+    "cosmic-lib": "^0.11.2",
+    "tweetnacl": "^1.0.0",
+    "tweetnacl-util": "^0.15.0"
+  }
+}
