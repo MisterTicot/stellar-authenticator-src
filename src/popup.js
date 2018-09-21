@@ -1,5 +1,5 @@
-import {Form} from './form'
-import * as node from '@cosmic-plus/jsutils/html'
+import Form from '@cosmic-plus/jsutils/form'
+import node from '@cosmic-plus/jsutils/html'
 
 const bodyNode = node.grab('body')
 const mainNode = node.grab('main')

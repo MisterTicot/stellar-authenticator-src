@@ -1,13 +1,13 @@
 import cosmicLib from 'cosmic-lib'
 import {CosmicLink} from 'cosmic-lib'
-import {Form} from './form'
 import {Popup, passwordPopup} from './popup'
 import {Database} from './database'
 import {Notification} from './notifications'
-import {download, readFile} from './helpers'
 import {makeSalt} from './crypto'
 
-import * as node from '@cosmic-plus/jsutils/html'
+import file from '@cosmic-plus/jsutils/file'
+import Form from '@cosmic-plus/jsutils/form'
+import node from '@cosmic-plus/jsutils/html'
 
 /** Global variables **/
 
@@ -181,7 +181,7 @@ export function importUser (loginPopup) {
       }
 
       await popup.setInfo('Loading user...')
-      const encrypted = await readFile(popup.inputs.file.files[0])
+      const encrypted = await file.load(popup.inputs.file.files[0])
       global.db = await Database.open(user, password, encrypted)
       await global.db.save()
       if (loginPopup) loginPopup.destroy()
@@ -566,6 +566,18 @@ async function refreshPublicKey () {
   if (copiedNode) node.destroy(copiedNode)
 }
 
+/***************************** Copy field *************************************/
+
+export async function copyContent (element) {
+  if (node.copyContent(element) && document.activeElement.value) {
+    const prevNode = node.grab('#copied')
+    if (prevNode) node.destroy(prevNode)
+    const copiedNode = node.create('div', '#copied', 'Copied')
+    element.parentNode.insertBefore(copiedNode, element.nextSibling)
+    setTimeout(() => { copiedNode.style.opacity = 0 }, 3000)
+  }
+}
+
 /** *************************** Settings ***************************************/
 
 const settingsNode = node.grab('#settings')
@@ -697,7 +709,7 @@ export function exportBackup () {
   popup.addValidator(async password => {
     await popup.setInfo('Checking password...')
     const backup = await global.db.backup(password)
-    download(global.db.username + '.user', backup)
+    file.save(global.db.username + '.user', backup)
   })
 }
 

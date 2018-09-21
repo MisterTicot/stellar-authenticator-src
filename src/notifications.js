@@ -1,4 +1,4 @@
-import * as node from '@cosmic-plus/jsutils/html'
+import node from '@cosmic-plus/jsutils/html'
 import {timeout} from '@cosmic-plus/jsutils/misc'
 
 const notificationsNode = node.grab('#notifications')
