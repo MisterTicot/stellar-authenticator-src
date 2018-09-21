@@ -1,35 +1,12 @@
-import { deriveKey, encryptString, decryptString, encryptObject, decryptObject,
-  makeSalt } from './crypto'
-import {encodeBase64, decodeBase64} from 'tweetnacl-util'
-import {timeout} from '@cosmic-plus/jsutils/misc'
+const helpers = require('@cosmic-plus/jsutils/misc')
+const utils = require('tweetnacl-util')
 
-function shareSessionStorage (event) {
-  if (!event.newValue) return
-  if (
-    event.key === 'getSessionStorage' &&
-    sessionStorage.length &&
-    !localStorage.sessionStorage
-  ) {
-    localStorage.sessionStorage = JSON.stringify(sessionStorage)
-    delete localStorage.sessionStorage
-  } else if (event.key === 'sessionStorage' && !sessionStorage.length) {
-    const data = JSON.parse(event.newValue)
-    sessionStorage.username = data.username
-    sessionStorage.userkey = data.userkey
-    if (data.password) sessionStorage.password = data.password
-  } else if (!document.hasFocus() && (event.key.substr(-9) === '_database' || event.key === 'logout')) {
-    sessionStorage.clear()
-    location.reload()
-  } else if (!document.hasFocus() && event.key === 'login' && !sessionStorage.length) {
-    location.reload()
-  }
-}
+const crypto = require('./crypto')
 
-if (!sessionStorage.length) localStorage.getSessionStorage = Date.now()
-delete localStorage.getSessionStorage
-window.addEventListener('storage', shareSessionStorage)
+/// session.js keeps database in sync over multiple browser tabs.
+require('./session.js')
 
-export class Database {
+module.exports = class Database {
   /**
    * Create a Database object using provided parameters. This should not be used
    * directly, use `Database.new` or `Database.load` instead.
@@ -43,7 +20,7 @@ export class Database {
    */
   constructor (username, key, salt, table, protocol = '1') {
     sessionStorage.username = username
-    sessionStorage.userkey = encodeBase64(key)
+    sessionStorage.userkey = utils.encodeBase64(key)
     this.username = username
     this.key = key
     this.salt = salt
@@ -63,9 +40,9 @@ export class Database {
    */
   static async new (username, password = '') {
     if (localStorage[username + '_database']) throw new Error('User already exist')
-    const salt = makeSalt()
+    const salt = crypto.makeSalt()
     const concat = concatCredentials(username, password)
-    const key = await deriveKey(concat, salt)
+    const key = await crypto.deriveKey(concat, salt)
     const seedsKey = await makeSeedsKey(concat, salt)
     const table = { version: 1, seedsKey: seedsKey, accounts: {}, contacts: {} }
     const db = new Database(username, key, salt, table)
@@ -86,8 +63,8 @@ export class Database {
     const concat = concatCredentials(username, password)
     const [salt, encryptedTable] = encrypted.split(',')
     const [protocol] = encryptedTable.split(':')
-    const key = await deriveKey(concat, salt, protocol)
-    const table = await decryptObject(encryptedTable, key)
+    const key = await crypto.deriveKey(concat, salt, protocol)
+    const table = await crypto.decryptObject(encryptedTable, key)
     return new Database(username, key, salt, table, protocol)
   }
 
@@ -114,21 +91,21 @@ export class Database {
    * Return the current session database, if any. Else, return `undefined`.
    */
   static async current () {
-    if (!sessionStorage.userkey) await timeout(50)
+    if (!sessionStorage.userkey) await helpers.timeout(50)
     if (!sessionStorage.userkey) {
       delete localStorage.guest_database
       return undefined
     }
     const username = sessionStorage.username
-    const key = decodeBase64(sessionStorage.userkey)
+    const key = utils.decodeBase64(sessionStorage.userkey)
     const encrypted = localStorage[username + '_database']
     const [salt, encryptedTable] = encrypted.split(',')
-    const table = await decryptObject(encryptedTable, key)
+    const table = await crypto.decryptObject(encryptedTable, key)
     return new Database(username, key, salt, table)
   }
 
   async save () {
-    const encrypted = await encryptObject(this.table, this.key)
+    const encrypted = await crypto.encryptObject(this.table, this.key)
     localStorage[this.username + '_database'] = this.salt + ',' + encrypted
   }
 
@@ -142,23 +119,23 @@ export class Database {
 
   /// Change password
   async changePassword (password, newPassword) {
-    const seedsKey = encodeBase64(await this.seedsKey(password))
+    const seedsKey = utils.encodeBase64(await this.seedsKey(password))
     const concat = concatCredentials(this.username, newPassword)
-    const salt = makeSalt()
-    const key = await deriveKey(concat, salt)
-    const encryptedSeedsKey = await encryptString(seedsKey, 'seeds' + concat, salt)
+    const salt = crypto.makeSalt()
+    const key = await crypto.deriveKey(concat, salt)
+    const encryptedSeedsKey = await crypto.encryptString(seedsKey, 'seeds' + concat, salt)
     this.table.seedsKey = encryptedSeedsKey
 
     this.salt = salt
     this.key = key
-    sessionStorage.userkey = encodeBase64(key)
+    sessionStorage.userkey = utils.encodeBase64(key)
     await this.save()
   }
 
   async seedsKey (password = '') {
     const concat = 'seeds' + concatCredentials(this.username, password)
-    const key = await decryptString(this.table.seedsKey, concat, this.salt)
-    return decodeBase64(key)
+    const key = await crypto.decryptString(this.table.seedsKey, concat, this.salt)
+    return utils.decodeBase64(key)
   }
 
   async addAccount (password, name, seed, network = 'public') {
@@ -166,7 +143,7 @@ export class Database {
 
     const publicKey = seedToPublicKey(seed)
     const seedsKey = await this.seedsKey(password)
-    const encryptedSeed = await encryptString(seed, seedsKey)
+    const encryptedSeed = await crypto.encryptString(seed, seedsKey)
     this.accounts[name] = { id: publicKey, seed: encryptedSeed, network: network }
     refreshAliases(this)
     await this.save()
@@ -208,7 +185,7 @@ export class Database {
     const seeds = []
     for (let index in names) {
       const account = names[index]
-      const seed = await decryptString(this.accounts[account].seed, seedsKey)
+      const seed = await crypto.decryptString(this.accounts[account].seed, seedsKey)
       seeds.push(seed)
     }
     if (seeds.length === 1) return seeds[0]
@@ -253,19 +230,19 @@ export class Database {
   async exportAccount (password, name) {
     this.checkAccountExist(name)
     const seedsKey = await this.seedsKey(password)
-    const seed = await decryptString(this.accounts[name].seed, seedsKey)
+    const seed = await crypto.decryptString(this.accounts[name].seed, seedsKey)
     const account = [name, seed, this.accounts[name].network]
-    const encryptedAccount = await encryptObject(account, seedsKey)
+    const encryptedAccount = await crypto.encryptObject(account, seedsKey)
     return encryptedAccount
   }
 
   async importAccount (password, encryptedAccount) {
     const seedsKey = await this.seedsKey(password)
-    const account = await decryptObject(encryptedAccount, seedsKey)
+    const account = await crypto.decryptObject(encryptedAccount, seedsKey)
     const [name, seed, network] = account
     this.checkAccountDoesntExist(name)
     const publicKey = seedToPublicKey(seed)
-    const encryptedSeed = await encryptString(seed, seedsKey)
+    const encryptedSeed = await crypto.encryptString(seed, seedsKey)
     this.accounts[name] = { id: publicKey, seed: encryptedSeed, network: network }
     refreshAliases(this)
     this.save()
@@ -307,8 +284,8 @@ function concatCredentials (username, password) {
 }
 
 async function makeSeedsKey (concat, salt) {
-  const key = makeSalt()
-  return encryptString(key, 'seeds' + concat, salt)
+  const key = crypto.makeSalt()
+  return crypto.encryptString(key, 'seeds' + concat, salt)
 }
 
 function seedToPublicKey (seed) {
@@ -365,7 +342,7 @@ async function getAccountsFromOldDb (password) {
   const accounts = []
   for (let index in seeds) {
     const encrypted = seeds[index]
-    const datas = await decryptObject(encrypted, password)
+    const datas = await crypto.decryptObject(encrypted, password)
     const secret = datas[1]
     let name, network
     if (datas[0].substr(0, 7) === '(test) ') {

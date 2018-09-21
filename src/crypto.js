@@ -1,30 +1,55 @@
-import scrypt from 'scrypt-async'
-import nacl from 'tweetnacl'
-import {decodeBase64, decodeUTF8, encodeBase64, encodeUTF8}
-  from 'tweetnacl-util'
+const crypto = exports
 
-const protocol = '1'
+const nacl = require('tweetnacl')
+const scrypt = require('scrypt-async')
+const utils = require('tweetnacl-util')
 
-const scryptOptionsTable = {
+/**
+ * Current protocol protocol.
+ */
+crypto.protocol = '1'
+
+/**
+ * Scrypt options history.
+ */
+crypto.optionsTable = {
   1: { N: 16384, r: 8, p: 1, dkLen: 32, encoding: 'binary' }
 }
 
-const latestScryptOptions = scryptOptionsTable[protocol]
+/**
+ * Default scrypt options.
+ */
+crypto.options = crypto.optionsTable[crypto.protocol]
 
-export function makeSalt (length = nacl.secretbox.keyLength) {
-  return encodeBase64(nacl.randomBytes(length))
+/**
+ * Returns `length` random bytes formatted in base64.
+ *
+ * @param {integer} [length = nacl.secretbox.keyLength]
+ * @return {string}
+ */
+crypto.makeSalt = function (length = nacl.secretbox.keyLength) {
+  return utils.encodeBase64(nacl.randomBytes(length))
 }
 
-export function deriveKey (password, salt, scryptOptions = latestScryptOptions) {
+/**
+ * Derive `password` using `salt`.
+ *
+ * @async
+ * @param {string} password
+ * @param {string} salt Base64 formatted.
+ * @param {Object} [options=crypto.options] Scrypt options
+ * @return {Buffer}
+ */
+crypto.deriveKey = function (password, salt, options = crypto.options) {
   return new Promise(function (resolve, reject) {
     if (!password || !salt) { throw new Error('Missing argument') }
 
-    if (typeof scryptOptions === 'string') {
-      scryptOptions = scryptOptionsTable[scryptOptions]
+    if (typeof options === 'string') {
+      options = crypto.optionsTable[options]
     }
 
     try {
-      scrypt(password, decodeBase64(salt), scryptOptions, resolve)
+      scrypt(password, utils.decodeBase64(salt), options, resolve)
     } catch (error) {
       console.log(error)
       reject(error)
@@ -32,50 +57,90 @@ export function deriveKey (password, salt, scryptOptions = latestScryptOptions) 
   })
 }
 
-export async function encryptString (string, key, salt) {
+/**
+ * Encrypt `string` using `key`. When `salt` is provided, use it to derive
+ * `key`.
+ *
+ * @param {string} string
+ * @param {string} key Base64 formatted
+ * @param {string} salt Base64 formatted
+ * @return {string} Encrypted `string`
+ */
+crypto.encryptString = async function (string, key, salt) {
   if (!string || !key) throw new Error('Missing argument')
 
-  if (salt) key = await deriveKey(key, salt)
+  if (salt) key = await crypto.deriveKey(key, salt)
   const nonce = nacl.randomBytes(nacl.secretbox.nonceLength)
-  const cipherText = nacl.secretbox(decodeUTF8(string), nonce, key)
+  const cipherText = nacl.secretbox(utils.decodeUTF8(string), nonce, key)
 
-  return protocol + ':' + encodeBase64(nonce) + ':' + encodeBase64(cipherText)
+  return crypto.protocol + ':' + utils.encodeBase64(nonce) + ':' + utils.encodeBase64(cipherText)
 }
 
-export async function decryptString (encryptedObject, key, salt) {
-  if (!encryptedObject || !key) throw new Error('Missing argument')
+/**
+ * Decrypt `encrypted` string. `encrypted` can be either a keystore (StellarPort
+ * format) or a keystring (@cosmic-plus format).
+ *
+ * @param {string|Object} encrypted
+ * @param {string} key Base64 formatted
+ * @paman {string} [salt] Base64 formatted; May be retrieved from keystring.
+ * @return {string} The decrypted string
+ */
+crypto.decryptString = async function (encrypted, key, salt) {
+  if (!encrypted || !key) throw new Error('Missing argument')
 
-  let cipherText, nonce, scryptOptions = latestScryptOptions
+  let protocol, options, cipherText, nonce
 
-  if (encryptedObject instanceof Object) {
-    scryptOptions = encryptedObject.scryptOptions
-    cipherText = decodeBase64(encryptedObject.ciphertext)
-    nonce = decodeBase64(encryptedObject.nonce)
-    salt = encryptedObject.salt
+  if (encrypted instanceof Object) {
+    /// Decrypt keystore (StellarPort format).
+    options = encrypted.scryptOptions
+    cipherText = utils.decodeBase64(encrypted.ciphertext)
+    nonce = utils.decodeBase64(encrypted.nonce)
+    salt = encrypted.salt
   } else {
-    const temp = encryptedObject.split(':')
-    scryptOptions = temp[0]
-    nonce = decodeBase64(temp[1])
-    cipherText = decodeBase64(temp[2])
+    /// Decrypt keystring (@cosmic-plus format).
+    const temp = encrypted.split(':')
+    protocol = temp[0]
+    options = crypto.optionsTable[protocol]
+    nonce = utils.decodeBase64(temp[1])
+    cipherText = utils.decodeBase64(temp[2])
     if (temp[3]) salt = temp[3]
 
-    if (protocol !== '1' || !nonce || !cipherText) {
+    if (!options || !nonce || !cipherText) {
       throw new Error('Invalid encrypted object')
     }
   }
 
-  if (salt) key = await deriveKey(key, salt, scryptOptions)
+  if (salt) key = await crypto.deriveKey(key, salt, options)
   const seed = nacl.secretbox.open(cipherText, nonce, key)
   if (!seed) throw new Error('Wrong password')
 
-  return encodeUTF8(seed)
+  return utils.encodeUTF8(seed)
 }
 
-export async function encryptObject (object, key, salt) {
-  return encryptString(JSON.stringify(object), key, salt)
+/**
+ * Encrypt `string` using `key`. When `salt` is provided, use it to derive
+ * `key`.
+ *
+ * @async
+ * @param {Object} object
+ * @param {string} key Base64 formatted
+ * @param {string} salt Base64 formatted
+ * @return {string} Encrypted `string`
+ */
+crypto.encryptObject = function (object, key, salt) {
+  return crypto.encryptString(JSON.stringify(object), key, salt)
 }
 
-export async function decryptObject (encryptedObject, key, salt) {
-  const string = await decryptString(encryptedObject, key, salt)
-  return JSON.parse(string)
+/**
+ * Decrypt `encrypted` object. `encrypted` can be either a keystore (StellarPort
+ * format) or a keystring (@cosmic-plus format).
+ *
+ * @async
+ * @param {string|Object} encrypted
+ * @param {string} key Base64 formatted
+ * @paman {string} [salt] Base64 formatted; May be retrieved from keystring.
+ * @return {Object} The decrypted object.
+ */
+crypto.decryptObject = function (encrypted, key, salt) {
+  return crypto.decryptString(encrypted, key, salt).then(x => JSON.parse(x))
 }

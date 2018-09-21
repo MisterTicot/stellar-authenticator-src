@@ -1,13 +1,15 @@
-import cosmicLib from 'cosmic-lib'
-import {CosmicLink} from 'cosmic-lib'
-import {Popup, passwordPopup} from './popup'
-import {Database} from './database'
-import {Notification} from './notifications'
-import {makeSalt} from './crypto'
+const cosmicLib = require('cosmic-lib')
+const CosmicLink = cosmicLib.CosmicLink
+const dom = require('@cosmic-plus/jsutils/dom')
+const file = require('@cosmic-plus/jsutils/file')
+const Form = require('@cosmic-plus/jsutils/form')
+const html = require('@cosmic-plus/jsutils/html')
 
-import file from '@cosmic-plus/jsutils/file'
-import Form from '@cosmic-plus/jsutils/form'
-import node from '@cosmic-plus/jsutils/html'
+const crypto = require('./crypto')
+const Database = require('./database')
+const passwordPopup = require('./popup').passwordPopup
+const Popup = require('./popup').Popup
+const Notification = require('./notifications')
 
 /** Global variables **/
 
@@ -17,6 +19,8 @@ const global = {
   signers: null,
   history: history.length
 }
+
+dom.transaction = dom.CL_htmlNode
 
 /** helpers ***/
 const publicServer = new StellarSdk.Server('https://horizon.stellar.org')
@@ -42,24 +46,20 @@ async function accountExist (publicKey, network) {
 
 /** Install button **/
 let deferredPrompt
-const installAppButton = node.grab('#installApp')
 
 window.addEventListener('beforeinstallprompt', function (event) {
   event.preventDefault()
   deferredPrompt = event
-  node.show(installAppButton)
+  html.show(dom.installApp)
 })
 
-installAppButton.addEventListener('click', function (event) {
-  node.hide(installAppButton)
+dom.installApp.addEventListener('click', function (event) {
+  html.hide(dom.installApp)
   deferredPrompt.prompt()
   deferredPrompt = undefined
 })
 
 /** ************************* Login in *****************************************/
-
-const mainNode = node.grab('main')
-const welcomePage = node.grab('#welcome')
 
 export async function init () {
   global.db = await Database.current()
@@ -67,14 +67,14 @@ export async function init () {
     upgrade()
   } else if (global.db) open()
   else if (localStorage.length) login()
-  else selectPage(welcomePage)
+  else selectPage(dom.welcome)
 }
 
 function login () {
   const selectNode = makeUserSelector()
 
   if (selectNode.length === 0) {
-    selectPage(welcomePage)
+    selectPage(dom.welcome)
     return
   }
 
@@ -83,14 +83,14 @@ function login () {
     usernameNode.value = selectNode.value
     const passwordNode = popup.inputs.password
     passwordNode.name = ''
-    const newNode = node.create('input', {
+    const newNode = html.create('input', {
       name: 'password',
       type: 'password',
       placeholder: 'Authenticator password'
     })
-    popup.node.insertBefore(newNode, passwordNode)
+    popup.html.appendinsertBefore(newNode, passwordNode)
     popup.inputs.password = newNode
-    node.destroy(passwordNode)
+    html.appenddestroy(passwordNode)
   }
 
   const last = localStorage.lastSelectedUser
@@ -98,23 +98,23 @@ function login () {
 
   const popup = new Popup('Please enter your password to start', true)
   const inputs = popup.inputs
-  const usernameNode = node.create('input', {
+  const usernameNode = html.create('input', {
     readonly: true,
     value: selectNode.value,
     name: 'username'
   })
-  node.hide(usernameNode)
+  html.hide(usernameNode)
 
   popup.addNode('usernameSelector', selectNode)
     .addNode('', usernameNode)
     .addPasswordBox('password')
     .addSubmit('Open')
     .addSeparator()
-    .addNode('', node.create('a', { onclick: () => newUser(popup) }, 'New User'))
+    .addNode('', html.create('a', { onclick: () => newUser(popup) }, 'New User'))
     .addNode('', ' | ')
-    .addNode('', node.create('a', { onclick: () => importUser(popup) }, 'Import User'))
+    .addNode('', html.create('a', { onclick: () => importUser(popup) }, 'Import User'))
     .addNode('', ' | ')
-    .addNode('', node.create('a', { onclick: () => guestMode(popup) }, 'Guest Mode'))
+    .addNode('', html.create('a', { onclick: () => guestMode(popup) }, 'Guest Mode'))
     .select()
     .addValidator(async function () {
       await popup.setInfo('Opening your session...')
@@ -129,10 +129,10 @@ function login () {
 }
 
 function makeUserSelector () {
-  const selectNode = node.create('select')
+  const selectNode = html.create('select')
   const usernames = Database.listUsers()
   usernames.forEach(user => {
-    node.append(selectNode, node.create('option', { value: user }, user))
+    html.append(selectNode, html.create('option', { value: user }, user))
   })
   return selectNode
 }
@@ -207,12 +207,11 @@ export function importUser (loginPopup) {
   }
 }
 
-const passwordNode = node.grab('#password')
-const loginOptions = new Form(node.grab('#loginOptions'))
+const loginOptions = new Form(dom.loginOptions)
 
 export async function guestMode (form = loginOptions) {
   await form.setInfo('Opening guest session...')
-  const password = makeSalt(3)
+  const password = crypto.makeSalt(3)
   sessionStorage.password = password
   global.db = await Database.new('guest', password)
   await global.db.newAccount(password, 'Guest', 'test')
@@ -248,7 +247,7 @@ function open () {
   refreshPage()
 
   /// Show guest mode password
-  if (sessionStorage.password) passwordNode.textContent = 'Password: ' + sessionStorage.password
+  if (sessionStorage.password) dom.password.textContent = 'Password: ' + sessionStorage.password
 }
 
 function handleQuery () {
@@ -265,19 +264,16 @@ function handleQuery () {
 
   if (location.search.length > 1) {
     resetReadTransactionPage()
-    selectPage(readTransactionPage)
+    selectPage(dom.readTransaction)
     parseQuery(location.search)
   } else {
-    selectPage(openTransactionPage)
+    selectPage(dom.openTransaction)
   }
 }
 
-const openTransactionPage = node.grab('#openTransaction')
-const readTransactionPage = node.grab('#readTransaction')
-
 /** **************************** Open transaction ******************************/
 
-const openUriForm = new Form(node.grab('#openUri'))
+const openUriForm = new Form(dom.openUri)
   .addValidator(() => {
     const uri = openUriForm.inputs.uri.value
     const query = uri.replace(/^[^?]*/, '')
@@ -286,7 +282,7 @@ const openUriForm = new Form(node.grab('#openUri'))
     openUriForm.reset()
   })
 
-const openXdrForm = new Form(node.grab('#openXdr'))
+const openXdrForm = new Form(dom.openXdr)
   .addValidator(() => {
     try {
       const inputs = openXdrForm.inputs
@@ -304,21 +300,16 @@ const openXdrForm = new Form(node.grab('#openXdr'))
     }
   })
 
-const xdrStripSourceNode = node.grab('#xdrStripSource')
-const xdrStripSequenceNode = node.grab('#xdrStripSequence')
-const xdrStripSignaturesNode = node.grab('#xdrStripSignatures')
 export function openXdrOption (element) {
   if (element.checked) {
-    xdrStripSourceNode.checked = false
-    xdrStripSequenceNode.checked = false
-    xdrStripSignaturesNode.checked = false
+    dom.xdrStripSource.checked = false
+    dom.xdrStripSequence.checked = false
+    dom.xdrStripSignatures.checked = false
     element.checked = true
   }
 }
 
 /** ***************************** Read transaction *****************************/
-
-const transactionNode = node.grab('#CL_htmlNode')
 
 async function parseQuery (query) {
   const account = currentAccount()
@@ -355,8 +346,8 @@ async function parseQuery (query) {
   }
   global.signers = []
   if (tdesc.source) {
-    for (let index in accountSelector.childNodes) {
-      const accountNode = accountSelector.childNodes[index]
+    for (let index in dom.accountSelector.childNodes) {
+      const accountNode = dom.accountSelector.childNodes[index]
       const accountName = accountNode.value
       const source = await global.cosmicLink.getSource()
       if (!accountName) continue
@@ -370,7 +361,7 @@ async function parseQuery (query) {
     }
 
     if (global.signers.length === 0) {
-      accountSelector.selectedIndex = -1
+      dom.accountSelector.selectedIndex = -1
       refreshPublicKey()
       new Notification('warning', 'No signer for this transaction',
         "There's no legit signer for this transaction among your accounts."
@@ -379,7 +370,7 @@ async function parseQuery (query) {
     }
 
     if (!global.signers.find(entry => entry === account)) {
-      accountSelector.value = global.signers[0]
+      dom.accountSelector.value = global.signers[0]
       refreshPublicKey()
     }
   } else {
@@ -391,7 +382,7 @@ async function parseQuery (query) {
 
   try {
     await global.cosmicLink.getXdr()
-    if (global.signers.length) signingButton.disabled = false
+    if (global.signers.length) dom.signingButton.disabled = false
   } catch (error) {
     console.log(error)
   }
@@ -439,13 +430,11 @@ function fundTestAccount (publicKey) {
   })
 }
 
-const uriViewerForm = new Form(node.grab('#uriViewer'))
+const uriViewerForm = new Form(dom.uriViewer)
 const uriBox = uriViewerForm.inputs.uri
-const xdrViewerForm = new Form(node.grab('#xdrViewer'))
+const xdrViewerForm = new Form(dom.xdrViewer)
 const xdrBox = xdrViewerForm.inputs.xdr
-
-const signingButton = node.grab('#signingButton')
-signingButton.disabled = true
+dom.signingButton.disabled = true
 
 export function signAndSend () {
   const popup = passwordPopup(global.db.username, 'Sign & send')
@@ -456,7 +445,7 @@ export function signAndSend () {
     if (global.signers.length === 1) await global.cosmicLink.sign(keypairs)
     else await global.cosmicLink.sign(...keypairs)
 
-    signingButton.disabled = true
+    dom.signingButton.disabled = true
 
     popup.destroy()
 
@@ -480,11 +469,11 @@ export function closeTransaction () {
 }
 
 function resetReadTransactionPage () {
-  node.clear(transactionNode)
+  html.clear(dom.transaction)
   uriViewerForm.reset()
   xdrViewerForm.reset()
   xdrBox.placeholder = 'Computing...'
-  signingButton.disabled = true
+  dom.signingButton.disabled = true
 }
 
 /** ****************************** History *************************************/
@@ -512,10 +501,6 @@ window.onpopstate = function () {
 
 /** ********************* Header & account selection ***************************/
 
-const accountSelector = node.grab('#accountSelector')
-const publicKeyNode = node.grab('#publicKey')
-const notificationsNode = node.grab('#notifications')
-
 function refreshPage () {
   refreshAccountSelector()
   refreshPublicKey()
@@ -524,22 +509,22 @@ function refreshPage () {
 
 export function selectAccount (account) {
   if (!account) {
-    account = accountSelector.value
+    account = dom.accountSelector.value
   } else {
-    accountSelector.value = account
+    dom.accountSelector.value = account
   }
-  localStorage[global.db.username + '_lastSelected'] = accountSelector.selectedIndex
+  localStorage[global.db.username + '_lastSelected'] = dom.accountSelector.selectedIndex
   refreshPublicKey()
   handleQuery()
   resetMenu()
 }
 
 function currentAccount () {
-  return accountSelector.value
+  return dom.accountSelector.value
 }
 
 function refreshAccountSelector () {
-  while (accountSelector.options.length) { accountSelector.remove(0) }
+  while (dom.accountSelector.options.length) { dom.accountSelector.remove(0) }
 
   const accountsList = global.db.listAccounts()
   const listWithNetwork = accountsList.map(account => {
@@ -547,32 +532,32 @@ function refreshAccountSelector () {
   }).sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase()))
 
   listWithNetwork.forEach(entry => {
-    const accountNode = node.create('option', { value: entry[1] }, entry[0])
-    node.append(accountSelector, accountNode)
+    const accountNode = html.create('option', { value: entry[1] }, entry[0])
+    html.append(dom.accountSelector, accountNode)
   })
 
   let lastIndex = localStorage[global.db.username + '_lastSelected'] || 0
   if (lastIndex > accountsList.length - 1) lastIndex = accountsList.length - 1
   localStorage[global.db.username + '_lastSelected'] = lastIndex
-  accountSelector.selectedIndex = lastIndex
+  dom.accountSelector.selectedIndex = lastIndex
 }
 
 async function refreshPublicKey () {
   const account = currentAccount()
-  if (account) publicKeyNode.value = global.db.publicKey(account)
-  else publicKeyNode.value = null
+  if (account) dom.publicKey.value = global.db.publicKey(account)
+  else dom.publicKey.value = null
 
-  const copiedNode = node.grab('#copied')
-  if (copiedNode) node.destroy(copiedNode)
+  const copiedNode = html.grab('#copied')
+  if (copiedNode) html.appenddestroy(copiedNode)
 }
 
-/***************************** Copy field *************************************/
+/** *************************** Copy field *************************************/
 
 export async function copyContent (element) {
-  if (node.copyContent(element) && document.activeElement.value) {
-    const prevNode = node.grab('#copied')
-    if (prevNode) node.destroy(prevNode)
-    const copiedNode = node.create('div', '#copied', 'Copied')
+  if (html.appendcopyContent(element) && document.activeElement.value) {
+    const prevNode = html.grab('#copied')
+    if (prevNode) html.appenddestroy(prevNode)
+    const copiedNode = html.create('div', '#copied', 'Copied')
     element.parentNode.insertBefore(copiedNode, element.nextSibling)
     setTimeout(() => { copiedNode.style.opacity = 0 }, 3000)
   }
@@ -580,29 +565,24 @@ export async function copyContent (element) {
 
 /** *************************** Settings ***************************************/
 
-const settingsNode = node.grab('#settings')
-const headerNode = node.grab('header')
-const menuButtonNode = node.grab('#menuButton')
-const messagesNode = node.grab('#messages')
-
 export function showMenu () {
-  node.append(headerNode, settingsNode)
-  node.show(settingsNode)
-  node.hide(mainNode)
+  html.append(dom.header, dom.settings)
+  html.show(dom.settings)
+  html.hide(dom.main)
 
-  headerNode.style.minHeight = '100%'
-  headerNode.style.position = 'absolute'
-  menuButtonNode.onclick = hideMenu
+  dom.header.style.minHeight = '100%'
+  dom.header.style.position = 'absolute'
+  dom.menuButton.onclick = hideMenu
   top()
 }
 
 function hideMenu () {
-  node.hide(settingsNode)
-  node.show(mainNode)
+  html.hide(dom.settings)
+  html.show(dom.main)
 
-  headerNode.style.minHeight = null
-  headerNode.style.position = 'fixed'
-  menuButtonNode.onclick = showMenu
+  dom.header.style.minHeight = null
+  dom.header.style.position = 'fixed'
+  dom.menuButton.onclick = showMenu
   resetMenu()
   top()
 }
@@ -613,7 +593,7 @@ function resetMenu () {
 
 export function showSetting (setting) {
   resetMenu()
-  node.grab('.show', settingsNode).className = ''
+  html.grab('.show', dom.settings).className = ''
   setting.className = 'show'
 }
 
@@ -628,22 +608,18 @@ export function showSecret () {
   popup.addValidator(async password => {
     await popup.setInfo('Decrypting secret seed...')
     const seed = await global.db.secretSeed(password, account)
-    const secretBox = node.grab('#secretSeed')
-    secretBox.value = seed
-    node.show(secretBox)
-    const button = node.grab('#switchSecret')
-    button.onclick = hideSecret
-    button.value = 'Hide secret seed'
+    dom.secretSeed.value = seed
+    html.show(dom.secretSeed)
+    dom.switchSecret.onclick = hideSecret
+    dom.switchSecret.value = 'Hide secret seed'
   })
 }
 
 function hideSecret () {
-  const seedBox = node.grab('#secretSeed')
-  seedBox.value = undefined
-  node.hide(seedBox)
-  const button = node.grab('#switchSecret')
-  button.onclick = showSecret
-  button.value = 'Show secret seed'
+  dom.secretSeed.value = undefined
+  html.hide(dom.secretSeed)
+  dom.switchSecret.onclick = showSecret
+  dom.switchSecret.value = 'Show secret seed'
 }
 
 export function removeAccount () {
@@ -731,7 +707,7 @@ export function passwordChange () {
       /// Delete guest mode default password
       if (sessionStorage.password) {
         delete sessionStorage.password
-        passwordNode.textContent = ''
+        dom.password.textContent = ''
       }
     })
 
@@ -769,71 +745,65 @@ export function logout () {
 
 /** ***************************** Page switching *******************************/
 
-const titleNode = node.grab('#title')
-const accountsNode = node.grab('#accounts')
-const disclaimerNode = node.grab('#disclaimer')
-const socialIcons = node.grab('#social')
-const aboutIcon = node.grab("#aboutIcon")
-
-const aboutPage = node.grab('#about')
-
 function top () { scroll(0, 0) }
 
 export function selectPage (element) {
   const previousPage = currentPage()
-  if (previousPage) mainNode.removeChild(previousPage)
-  node.clear(notificationsNode)
+  if (previousPage) dom.main.removeChild(previousPage)
+  html.clear(dom.notifications)
 
   if (element) {
-    node.show(mainNode)
-    node.append(mainNode, element)
-  } else node.hide(mainNode)
+    html.show(dom.main)
+    html.append(dom.main, element)
+  } else {
+    html.hide(dom.main)
+  }
 
   top()
 }
 
 export function currentPage () {
-  return node.grab('.page', mainNode)
+  return html.grab('.page', dom.main)
 }
 
 function headerShowTitle () {
-  node.hide(accountsNode)
-  node.show(titleNode)
+  html.hide(dom.accounts)
+  html.show(dom.title)
 }
 
 function headerShowAccounts () {
-  node.hide(titleNode)
-  node.show(accountsNode)
+  html.hide(dom.title)
+  html.show(dom.accounts)
 }
 
 function showMessages () {
-  node.show(messagesNode)
+  html.show(dom.messages)
 }
 
 function hideMessages () {
-  node.hide(messagesNode)
+  html.hide(dom.messages)
 }
 
 function clearMessages () {
-  node.clear(passwordNode)
-  node.clear(notificationsNode)
+  html.clear(dom.password)
+  html.clear(dom.notifications)
 }
 
 function footerShowDisclaimer () {
-  node.hide(socialIcons)
-  node.show(disclaimerNode)
+  html.hide(dom.social)
+  html.show(dom.disclaimer)
 }
 
 const openAboutPage = () => { pushQuery('?about') }
 function footerShowAbout () {
-  node.hide(disclaimerNode)
-  node.show(socialIcons)
-  aboutIcon.onclick = openAboutPage
+  html.hide(dom.disclaimer)
+  html.show(dom.social)
+  dom.aboutIcon.onclick = openAboutPage
 }
 
 function about () {
   headerShowTitle()
   hideMessages()
-  selectPage(aboutPage)
-  aboutIcon.onclick = null
+  selectPage(dom.about)
+  dom.aboutIcon.onclick = null
 }

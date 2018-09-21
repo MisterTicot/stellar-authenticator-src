@@ -1,22 +1,21 @@
-import node from '@cosmic-plus/jsutils/html'
-import {timeout} from '@cosmic-plus/jsutils/misc'
+const dom = require('@cosmic-plus/jsutils/dom')
+const html = require('@cosmic-plus/jsutils/html')
+const helpers = require('@cosmic-plus/jsutils/misc')
 
-const notificationsNode = node.grab('#notifications')
-
-export class Notification {
+module.exports = class Notification {
   constructor (type, title, message, delay) {
-    this.node = node.create('div', '.' + type)
+    this.node = html.create('div', '.' + type)
     if (type === 'loading') {
-      node.append(this.node, node.create('span', '.CL_loadingAnim'))
+      html.append(this.node, html.create('span', '.CL_loadingAnim'))
     }
-    node.append(this.node, node.create('h3', null, title))
-    node.append(notificationsNode, this.node)
+    html.append(this.node, html.create('h3', null, title))
+    html.append(dom.notifications, this.node)
 
-    if (message) node.append(this.node, message)
-    if (delay) timeout(delay).then(() => this.destroy())
+    if (message) html.append(this.node, message)
+    if (delay) helpers.timeout(delay).then(() => this.destroy())
   }
 
   show () { this.hidden = false }
   hide () { this.hidden = true }
-  destroy () { node.destroy(this.node) }
+  destroy () { html.destroy(this.node) }
 }

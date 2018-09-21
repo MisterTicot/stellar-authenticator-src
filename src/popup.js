@@ -1,14 +1,13 @@
-import Form from '@cosmic-plus/jsutils/form'
-import node from '@cosmic-plus/jsutils/html'
+const popup = exports
 
-const bodyNode = node.grab('body')
-const mainNode = node.grab('main')
-const headerNode = node.grab('header')
+const dom = require('@cosmic-plus/jsutils/dom')
+const Form = require('@cosmic-plus/jsutils/form')
+const html = require('@cosmic-plus/jsutils/html')
 
-const shadowNode = node.create('div', '#shadow')
-bodyNode.insertBefore(shadowNode, bodyNode.firstChild)
+dom.shadow = html.create('div', '#shadow')
+dom.body.insertBefore(dom.shadow, dom.body.firstChild)
 
-export function passwordPopup (username, title = 'Please confirm this operation', message) {
+popup.passwordPopup = function (username, title = 'Please confirm this operation', message) {
   const popup = new Popup(title)
   if (message) popup.addMessage(message).addSeparator()
   popup.putInfoNode()
@@ -17,16 +16,16 @@ export function passwordPopup (username, title = 'Please confirm this operation'
   return popup
 }
 
-export class Popup {
+popup.Popup = class Popup {
   constructor (title, noShadow) { return createPopup(title, noShadow) }
 }
 
 function createPopup (title, noShadow) {
   const popup = new Form()
   popup.isPopup = true
-  popup.window = node.create('div', '.popup', popup.node)
-  popup.addNode('', node.create('h3', null, title)).addSeparator().putInfoNode()
-  node.append(bodyNode, popup.window)
+  popup.window = html.create('div', '.popup', popup.node)
+  popup.addNode('', html.create('h3', null, title)).addSeparator().putInfoNode()
+  html.append(dom.body, popup.window)
 
   if (!noShadow) popup.shadow = true
 
@@ -47,31 +46,31 @@ function createPopup (title, noShadow) {
 }
 
 function showPopup (popup, noShadow) {
-  node.show(popup.window)
+  html.show(popup.window)
   if (popup.shadow) {
-    shadowNode.style.display = 'block'
-    shadowNode.onclick = () => popup.onExit()
-    node.appendClass(headerNode, 'blur')
-    node.appendClass(mainNode, 'blur')
-    bodyNode.style.overflow = 'hidden'
+    dom.shadow.style.display = 'block'
+    dom.shadow.onclick = () => popup.onExit()
+    html.appendClass(dom.header, 'blur')
+    html.appendClass(dom.main, 'blur')
+    dom.body.style.overflow = 'hidden'
   }
-  node.append(bodyNode, popup.window)
+  html.append(dom.body, popup.window)
 }
 
 function hidePopup (popup) {
   popup.onExit = function () { popup.hide(); popup.reset() }
-  if (popup.window.parentNode === bodyNode) bodyNode.removeChild(popup.window)
-  bodyNode.style.overflow = 'auto'
+  if (popup.window.parentNode === dom.body) dom.body.removeChild(popup.window)
+  dom.body.style.overflow = 'auto'
   if (popup.shadow) {
-    node.hide(shadowNode)
-    headerNode.classList.remove('blur')
-    mainNode.classList.remove('blur')
+    html.hide(dom.shadow)
+    dom.header.classList.remove('blur')
+    dom.main.classList.remove('blur')
   }
 }
 
 function destroyPopup (popup) {
   hidePopup(popup)
-  node.destroy(popup.window)
+  html.destroy(popup.window)
 }
 
 function addCloseButton (popup) {
@@ -81,6 +80,6 @@ function addCloseButton (popup) {
 
 function addCancelConfirmButtons (popup) {
   popup.addButton('cancel', '✘ Cancel', popup.onExit)
-    .addNode('', node.create('div', '.padding', ' '))
+    .addNode('', html.create('div', '.padding', ' '))
     .addSubmit().select()
 }
