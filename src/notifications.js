@@ -6,7 +6,7 @@ module.exports = class Notification {
   constructor (type, title, message, delay) {
     this.node = html.create('div', '.' + type)
     if (type === 'loading') {
-      html.append(this.node, html.create('span', '.CL_loadingAnim'))
+      html.append(this.node, html.create('span', '.cosmiclib_loadingAnim'))
     }
     html.append(this.node, html.create('h3', null, title))
     html.append(dom.notifications, this.node)

@@ -6,6 +6,7 @@ const CACHE_FILES = [
   'index.html',
   'authenticator.css',
   'authenticator.js',
+  'cosmic-lib.css',
   'stellar-sdk.js'
 ]
 

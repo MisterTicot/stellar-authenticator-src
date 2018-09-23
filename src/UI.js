@@ -1,15 +1,20 @@
+const axios = require('@cosmic-plus/base/axios')
 const cosmicLib = require('cosmic-lib')
 const CosmicLink = cosmicLib.CosmicLink
 const dom = require('@cosmic-plus/jsutils/dom')
 const file = require('@cosmic-plus/jsutils/file')
 const Form = require('@cosmic-plus/jsutils/form')
 const html = require('@cosmic-plus/jsutils/html')
+const StellarSdk = require('@cosmic-plus/base/stellar-sdk')
 
 const crypto = require('./crypto')
 const Database = require('./database')
-const passwordPopup = require('./popup').passwordPopup
-const Popup = require('./popup').Popup
+const Popup = require('./popup')
+const passwordPopup = Popup.passwordPopup
 const Notification = require('./notifications')
+
+/** Preload **/
+cosmicLib.load.styles('cosmic-lib.css')
 
 /** Global variables **/
 
@@ -18,30 +23,6 @@ const global = {
   db: null,
   signers: null,
   history: history.length
-}
-
-dom.transaction = dom.CL_htmlNode
-
-/** helpers ***/
-const publicServer = new StellarSdk.Server('https://horizon.stellar.org')
-const testingServer = new StellarSdk.Server('https://horizon-testnet.stellar.org')
-
-function getServer (network) {
-  switch (network) {
-    case undefined:
-    case 'public': return publicServer
-    case 'test': return testingServer
-    default: throw new Error('Invalid network: ' + network)
-  }
-}
-
-async function accountExist (publicKey, network) {
-  try {
-    await getServer(network).loadAccount(publicKey)
-    return true
-  } catch (error) {
-    return false
-  }
 }
 
 /** Install button **/
@@ -58,6 +39,15 @@ dom.installApp.addEventListener('click', function (event) {
   deferredPrompt.prompt()
   deferredPrompt = undefined
 })
+
+/**
+ * Protect cosmicLib default aliases.
+ *
+ * In `cosmicLib.config.aliases.__proto__` => Default aliases
+ * In `cosmicLib.config.aliases` => User-related aliases
+ */
+console.log(cosmicLib.config)
+cosmicLib.config.aliases = Object.create(cosmicLib.config.aliases)
 
 /** ************************* Login in *****************************************/
 
@@ -241,9 +231,11 @@ async function upgrade () {
     })
 }
 
-function open () {
+async function open () {
   headerShowAccounts()
   footerShowAbout()
+  cosmicLib.config.addAliases(global.db.aliases)
+  await cosmicLib.load.styles()
   refreshPage()
 
   /// Show guest mode password
@@ -311,52 +303,84 @@ export function openXdrOption (element) {
 
 /** ***************************** Read transaction *****************************/
 
-async function parseQuery (query) {
-  const account = currentAccount()
-  const network = account && global.db.network(account)
-  const publicKey = account && global.db.publicKey(account)
+async function parseQuery (query = location.search) {
+  let account = currentAccount()
+  let network = cosmicLib.config.network = account && global.db.network(account)
+  let publicKey = cosmicLib.config.source = account && global.db.publicKey(account)
+  const cosmicLink = global.cosmicLink = new CosmicLink(query)
+  uriBox.value = cosmicLink.uri
+  xdrBox.value = cosmicLink.xdr || ''
+  xdrBox.placeholder = cosmicLink.status || 'Computing...'
 
-  global.cosmicLink = new CosmicLink(query, { network: network, user: publicKey })
-  global.cosmicLink.addAliases(global.db.aliases)
-  if (!account) return
+  const tdesc = cosmicLink.tdesc
 
-  /// Check if account exists.
-  const loadingMsg = new Notification('loading', 'Loading account...')
-  let exist = await accountExist(publicKey, network)
-  loadingMsg.destroy()
-  if (currentAccount() !== account) return
-
-  /// Fund empty test accounts.
-  if (!exist) {
-    if (network === 'test') {
-      await fundTestAccount(publicKey)
-      parseQuery(query)
-      return
+  /// Filter possible signers by network if provided in query.
+  if (cosmicLink.tdesc.network) {
+    dom.accountSelector.childNodes.forEach(node => {
+      if (node.network !== cosmicLink.tdesc.network) node.disabled = true
+    })
+    if (network !== cosmicLink.tdesc.network) {
+      account = selectValidAccount()
+      network = cosmicLink.tdesc.network
     }
   }
 
-  /// Find legit signers
-  let tdesc, signers
+  /// Select transaction source account if available.
+  if (cosmicLink.tdesc.source) {
+    const source = await cosmicLib.resolve.address(cosmicLink.tdesc.source)
+    if (currentAccount() !== account) return
+    dom.accountSelector.childNodes.forEach(node => {
+      if (node.publicKey !== source.account_id) node.disabled = true
+    })
+    account = selectValidAccount()
+  }
+
+  if (!account) {
+    if (!cosmicLink.tdesc.source) {
+      xdrBox.placeholder = 'No source account selected'
+      return
+    }
+  } else {
+    /// Check if account exists.
+    const loadingMsg = new Notification('loading', 'Loading account...')
+    const accountIsEmpty = await cosmicLib.resolve.isAccountEmpty(publicKey)
+    loadingMsg.destroy()
+    if (currentAccount() !== account) return
+
+    /// Fund empty test accounts.
+    if (accountIsEmpty) {
+      if (network === 'test') {
+        await fundTestAccount(publicKey)
+      } else {
+        new Notification('warning', 'Empty account')
+      }
+    }
+  }
+
   try {
-    tdesc = await global.cosmicLink.getTdesc()
-    signers = await global.cosmicLink.getSigners()
+    await cosmicLink.lock()
+    xdrBox.value = cosmicLink.xdr
   } catch (error) {
-    console.log(error)
+    xdrBox.placeholder = cosmicLink.status
+    console.error(error)
     return
   }
+
+  /// Find legit signers.
   global.signers = []
   if (tdesc.source) {
     for (let index in dom.accountSelector.childNodes) {
-      const accountNode = dom.accountSelector.childNodes[index]
-      const accountName = accountNode.value
-      const source = await global.cosmicLink.getSource()
-      if (!accountName) continue
-      const publicKey = global.db.publicKey(accountName)
-      if (signers.find(entry => entry.value === publicKey)) {
-        if (publicKey === source) global.signers.unshift(accountName)
-        else global.signers.push(accountName)
+      const node = dom.accountSelector.childNodes[index]
+      if (!node.publicKey) continue
+      if (!cosmicLink.transaction.hasSigner(node.publicKey)) {
+        node.disabled = true
       } else {
-        accountNode.disabled = true
+        node.disabled = false
+        if (node.publicKey === cosmicLink.tdesc.source) {
+          global.signers.unshift(node.value)
+        } else {
+          global.signers.push(node.value)
+        }
       }
     }
 
@@ -364,8 +388,7 @@ async function parseQuery (query) {
       dom.accountSelector.selectedIndex = -1
       refreshPublicKey()
       new Notification('warning', 'No signer for this transaction',
-        "There's no legit signer for this transaction among your accounts."
-      )
+        "There's no legit signer for this transaction among your accounts.")
       return
     }
 
@@ -374,60 +397,31 @@ async function parseQuery (query) {
       refreshPublicKey()
     }
   } else {
-    signers.forEach(signer => {
-      const accountName = global.db.accountName(signer.value, network)
+    cosmicLink.transaction.signersList.forEach(signer => {
+      const accountName = global.db.accountName(signer, network)
       if (accountName) global.signers.push(accountName)
     })
   }
 
-  try {
-    await global.cosmicLink.getXdr()
-    if (global.signers.length) dom.signingButton.disabled = false
-  } catch (error) {
-    console.log(error)
+  if (!cosmicLink.errors && global.signers.length) {
+    dom.signingButton.disabled = false
   }
 }
 
-cosmicLib.defaults.addFormatHandler('xdr', event => {
-  if (event.cosmicLink !== global.cosmicLink) return
-  if (event.value) xdrBox.value = event.value
-  else xdrBox.placeholder = event.error.message
-})
+async function fundTestAccount (publicKey) {
+  const fundingMsg = new Notification('loading', 'Funding testnet account...')
+  const account = currentAccount()
 
-cosmicLib.defaults.addFormatHandler('uri', event => {
-  if (event.cosmicLink !== global.cosmicLink) return
-  if (event.value) uriBox.value = event.value
-  else uriBox.placeholder = event.error.message
-})
-
-cosmicLib.defaults.addFormatHandler('query', event => {
-  if (event.cosmicLink !== global.cosmicLink) return
-  if (event.value) history.replaceState(null, '', event.value)
-  else console.log(event.error)
-})
-
-function fundTestAccount (publicKey) {
-  return new Promise(function (resolve, reject) {
-    const account = currentAccount()
-    const fundingMsg = new Notification('loading', 'Funding testnet account...')
-
-    const xhr = new XMLHttpRequest()
-    xhr.open('GET', 'https://friendbot.stellar.org/?addr=' + publicKey, true)
-    xhr.send()
-    xhr.onloadend = function () {
-      fundingMsg.destroy()
-      if (currentAccount() !== account) return
-      if (xhr.readyState === 4 && xhr.status === 200) {
-        resolve()
-      } else {
-        console.log(xhr.response)
-        new Notification('warning', "Can't fund account",
-          'For some reason, Stellar friend bot could not fund your testnet account.'
-        )
-        reject()
-      }
-    }
-  })
+  try {
+    await axios('https://friendbot.stellar.org/?addr=' + publicKey)
+    fundingMsg.destroy()
+  } catch (error) {
+    console.error(error)
+    fundingMsg.destroy()
+    if (currentAccount() !== account) return
+    new Notification('warning', "Can't fund account",
+      'For some reason, Stellar friend bot could not fund your testnet account.')
+  }
 }
 
 const uriViewerForm = new Form(dom.uriViewer)
@@ -439,25 +433,34 @@ dom.signingButton.disabled = true
 export function signAndSend () {
   const popup = passwordPopup(global.db.username, 'Sign & send')
   popup.addValidator(async password => {
+    const cosmicLink = global.cosmicLink
+    const signers = global.signers
     await popup.setInfo('Signing transaction...')
 
-    const keypairs = await global.db.keypair(password, ...global.signers)
-    if (global.signers.length === 1) await global.cosmicLink.sign(keypairs)
-    else await global.cosmicLink.sign(...keypairs)
+    const keypairs = await global.db.keypair(password, ...signers)
+    if (signers.length === 1) cosmicLink.sign(keypairs)
+    else cosmicLink.sign(...keypairs)
 
     dom.signingButton.disabled = true
+    uriBox.value = cosmicLink.uri
+    xdrBox.value = cosmicLink.xdr
+    history.replaceState(null, '', cosmicLink.query)
+    dom.accountSelector.childNodes.forEach(node => {
+      if (!cosmicLink.transaction.hasSigner(node.publicKey)) node.disabled = true
+    })
 
     popup.destroy()
 
     top()
     const message2 = new Notification('loading', 'Sending transaction...')
     try {
-      const response = await global.cosmicLink.send()
+      const response = await cosmicLink.send()
       if (!response.stellarGuard) new Notification('done', 'Transaction validated')
       else new Notification('done', 'Transaction submitted to Stellar Guard')
     } catch (error) {
-      console.log(error)
-      new Notification('warning', 'Transaction rejected', error)
+      console.log(error.response)
+      const message = error.response.data.message || error
+      new Notification('warning', 'Transaction rejected', message)
     }
     message2.destroy()
   })
@@ -465,11 +468,12 @@ export function signAndSend () {
 
 export function closeTransaction () {
   delete global.cosmicLink
+  delete global.signers
   popQuery()
 }
 
 function resetReadTransactionPage () {
-  html.clear(dom.transaction)
+  html.clear(dom.cosmiclink_description)
   uriViewerForm.reset()
   xdrViewerForm.reset()
   xdrBox.placeholder = 'Computing...'
@@ -507,12 +511,32 @@ function refreshPage () {
   handleQuery()
 }
 
-export function selectAccount (account) {
-  if (!account) {
-    account = dom.accountSelector.value
-  } else {
-    dom.accountSelector.value = account
+/**
+ * Select the non-disabled account entry whose ID is `publicKey`, or the first
+ * non-disabled account entry as a fallback.
+ */
+function selectValidAccount () {
+  if (!dom.accountSelector[dom.accountSelector.selectedIndex].disabled) return
+  else dom.accountSelector.value = undefined
+
+  for (let index in dom.accountSelector.childNodes) {
+    const node = dom.accountSelector.childNodes[index]
+    if (!node.publicKey || node.disabled) continue
+    if (node.publicKey === publicKey) {
+      dom.accountSelector.value = node.value
+      break
+    } else if (!dom.accountSelector.value) {
+      dom.accountSelector.selectedIndex = index
+    }
   }
+  refreshPublicKey()
+  return currentAccount()
+}
+
+export function selectAccount (account) {
+  if (!account) account = dom.accountSelector.value
+  else dom.accountSelector.value = account
+
   localStorage[global.db.username + '_lastSelected'] = dom.accountSelector.selectedIndex
   refreshPublicKey()
   handleQuery()
@@ -526,18 +550,22 @@ function currentAccount () {
 function refreshAccountSelector () {
   while (dom.accountSelector.options.length) { dom.accountSelector.remove(0) }
 
-  const accountsList = global.db.listAccounts()
-  const listWithNetwork = accountsList.map(account => {
-    return [ global.db.network(account) + ': ' + account, account ]
+  const accountsHtmlNodes = global.db.listAccounts().map(name => {
+    const publicKey = global.db.publicKey(name)
+    const network = global.db.network(name)
+    const description = network + ': ' + name
+    const htmlNode = html.create('option',
+      { value: name, publicKey: publicKey, network: network },
+      description)
+    return [ description, htmlNode ]
   }).sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase()))
 
-  listWithNetwork.forEach(entry => {
-    const accountNode = html.create('option', { value: entry[1] }, entry[0])
-    html.append(dom.accountSelector, accountNode)
-  })
+  accountsHtmlNodes.forEach(pair => html.append(dom.accountSelector, pair[1]))
 
   let lastIndex = localStorage[global.db.username + '_lastSelected'] || 0
-  if (lastIndex > accountsList.length - 1) lastIndex = accountsList.length - 1
+  if (lastIndex > accountsHtmlNodes.length - 1) {
+    lastIndex = accountsHtmlNodes.length - 1
+  }
   localStorage[global.db.username + '_lastSelected'] = lastIndex
   dom.accountSelector.selectedIndex = lastIndex
 }
@@ -554,7 +582,7 @@ async function refreshPublicKey () {
 /** *************************** Copy field *************************************/
 
 export async function copyContent (element) {
-  if (html.appendcopyContent(element) && document.activeElement.value) {
+  if (html.copyContent(element) && document.activeElement.value) {
     const prevNode = html.grab('#copied')
     if (prevNode) html.appenddestroy(prevNode)
     const copiedNode = html.create('div', '#copied', 'Copied')
@@ -635,7 +663,9 @@ export function removeAccount () {
 
   popup.addValidator(async password => {
     await popup.setInfo('Removing account...')
+    const publicKey = global.db.publicKey(account)
     await global.db.removeAccount(password, account)
+    cosmicLib.config.removeAliases([publicKey])
     refreshPage()
   })
 }
@@ -674,6 +704,7 @@ export function newAccount () {
 
       await popup.setInfo('Creating new account...')
       await global.db.newAccount(password, name, network)
+      cosmicLib.config.addAliases(global.db.aliases)
       refreshAccountSelector()
       selectAccount(name)
       hideMenu()
@@ -734,8 +765,12 @@ export function removeUser (password) {
 export function logout () {
   hideMenu()
   global.db.logout()
-  global.db = undefined
+  delete global.db
   clearMessages()
+  history.replaceState(null, '', '?')
+
+  /// Remove user-related aliases.
+  cosmicLib.config.aliases = Object.create(cosmicLib.config.aliases.__proto__)
 
   headerShowTitle()
   selectPage()

@@ -1,5 +1,3 @@
-const popup = exports
-
 const dom = require('@cosmic-plus/jsutils/dom')
 const Form = require('@cosmic-plus/jsutils/form')
 const html = require('@cosmic-plus/jsutils/html')
@@ -7,17 +5,17 @@ const html = require('@cosmic-plus/jsutils/html')
 dom.shadow = html.create('div', '#shadow')
 dom.body.insertBefore(dom.shadow, dom.body.firstChild)
 
-popup.passwordPopup = function (username, title = 'Please confirm this operation', message) {
+const Popup = module.exports = class Popup {
+  constructor (title, noShadow) { return createPopup(title, noShadow) }
+}
+
+Popup.passwordPopup = function (username, title = 'Please confirm this operation', message) {
   const popup = new Popup(title)
   if (message) popup.addMessage(message).addSeparator()
   popup.putInfoNode()
     .addPasswordConfirmation(username)
     .addValidator(() => popup.inputs.password.value)
   return popup
-}
-
-popup.Popup = class Popup {
-  constructor (title, noShadow) { return createPopup(title, noShadow) }
 }
 
 function createPopup (title, noShadow) {
