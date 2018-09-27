@@ -1,5 +1,5 @@
 import * as UI from './UI'
-import {copyContent} from '@cosmic-plus/jsutils/misc'
+import {copyContent} from './helpers'
 
 module.exports = UI
 module.exports.copyContent = copyContent
