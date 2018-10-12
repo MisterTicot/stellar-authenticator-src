@@ -13,6 +13,11 @@ const Popup = require('./popup')
 const passwordPopup = Popup.passwordPopup
 const Notification = require('./notifications')
 
+/// Temporary fix waiting for next cosmic-lib update:
+if (!NodeList.prototype.forEach) {
+  NodeList.prototype.forEach = Array.prototype.forEach
+}
+
 /** Preload **/
 cosmicLib.load.styles('cosmic-lib.css')
 
