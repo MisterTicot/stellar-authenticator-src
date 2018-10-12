@@ -7,10 +7,6 @@ const config = {
      {
         test: /\.(js)$/,
         loader: 'babel-loader'
-     },
-     {
-       test: /\.css$/,
-       use: ['style-loader', 'postcss-loader']
      }
     ]
   },
