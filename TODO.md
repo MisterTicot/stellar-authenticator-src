@@ -1,22 +1,28 @@
 Before stable release (planned for this autumn):
 * Have a native english speaker check all the texts
-* Cloud backup
-* Signing datas capabilities
 * Better address information interface
 * Offer to define aliases for contacts
+* Signing datas capabilities
 * Make it easier to run the website locally
-* More anti-phishing features
+* Update service worker
+* Update README.md
+
+Before V2 (planned next spring):
+* Login with Google & co
+* Cloud backup
+* Balance / payment / account UI
+* Offer ways to fund new accounts
+* Private networks support
+* User-friendly multi-signature management
+* Support for watch-only & empty signers addresses
+* Support for addresses which are controled by their own secret key
+* Beginner-mode
+* Ledger nano S support
+* Trezor wallet support
+* Encrypted paper wallet
+* Anti-phishing protection
 
 Later:
 * Internationalization support
 * First translations
-* Integration into external websites
 * Integrated QR scanner
-* Paper wallet
-
-
-Not included there but to be implemented via cosmic-lib:
-* Ledger nano S support
-* 2-FA with StellarGuard
-* Support DKIF protocol
-* Private networks
