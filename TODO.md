@@ -4,7 +4,6 @@ Before stable release (planned for this autumn):
 * Offer to define aliases for contacts
 * Signing datas capabilities
 * Make it easier to run the website locally
-* Update service worker
 * Update README.md
 
 Before V2 (planned next spring):
