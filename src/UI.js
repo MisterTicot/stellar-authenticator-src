@@ -305,8 +305,6 @@ export function openXdrOption (element) {
 
 async function parseQuery (query = location.search) {
   let account = currentAccount()
-  let network = cosmicLib.config.network = account && global.db.network(account)
-  let publicKey = cosmicLib.config.source = account && global.db.publicKey(account)
   const cosmicLink = global.cosmicLink = new CosmicLink(query)
   uriBox.value = cosmicLink.uri
   xdrBox.value = cosmicLink.xdr || ''
@@ -319,30 +317,30 @@ async function parseQuery (query = location.search) {
     dom.accountSelector.childNodes.forEach(node => {
       if (node.network !== cosmicLink.tdesc.network) node.disabled = true
     })
-    if (network !== cosmicLink.tdesc.network) {
-      account = selectValidAccount()
-      network = cosmicLink.tdesc.network
-    }
+    account = selectValidAccount()
   }
 
   /// Select transaction source account if available.
   if (cosmicLink.tdesc.source) {
     const source = await cosmicLib.resolve.address(cosmicLink.tdesc.source)
-    if (currentAccount() !== account) return
     dom.accountSelector.childNodes.forEach(node => {
       if (node.publicKey !== source.account_id) node.disabled = true
     })
     account = selectValidAccount()
   }
 
+  const network = cosmicLib.config.network = (account && global.db.network(account)) || 'public'
+  const publicKey = cosmicLib.config.source = account && global.db.publicKey(account)
+
   if (!account) {
-    if (!cosmicLink.tdesc.source) {
-      xdrBox.placeholder = 'No source account selected'
-      return
-    }
+    // if (!cosmicLink.tdesc.source) {
+    // xdrBox.placeholder = 'No source account selected'
+    // return
+    // }
   } else {
     /// Check if account exists.
     const loadingMsg = new Notification('loading', 'Loading account...')
+
     const accountIsEmpty = await cosmicLib.resolve.isAccountEmpty(publicKey)
     loadingMsg.destroy()
     if (currentAccount() !== account) return
@@ -359,7 +357,8 @@ async function parseQuery (query = location.search) {
 
   try {
     await cosmicLink.lock()
-    xdrBox.value = cosmicLink.xdr
+    if (account || tdesc.source) xdrBox.value = cosmicLink.xdr
+    else xdrBox.placeholder = 'No source account selected'
   } catch (error) {
     xdrBox.placeholder = cosmicLink.status
     console.error(error)
@@ -384,14 +383,6 @@ async function parseQuery (query = location.search) {
       }
     }
 
-    if (global.signers.length === 0) {
-      dom.accountSelector.selectedIndex = -1
-      refreshPublicKey()
-      new Notification('warning', 'No signer for this transaction',
-        "There's no legit signer for this transaction among your accounts.")
-      return
-    }
-
     if (!global.signers.find(entry => entry === account)) {
       dom.accountSelector.value = global.signers[0]
       refreshPublicKey()
@@ -401,6 +392,14 @@ async function parseQuery (query = location.search) {
       const accountName = global.db.accountName(signer, network)
       if (accountName) global.signers.push(accountName)
     })
+  }
+
+  if (global.signers.length === 0) {
+    dom.accountSelector.selectedIndex = -1
+    refreshPublicKey()
+    new Notification('warning', 'No signer for this transaction',
+      "There's no legit signer for this transaction among your accounts.")
+    return
   }
 
   if (!cosmicLink.errors && global.signers.length) {
@@ -515,9 +514,12 @@ function refreshPage () {
  * Select the non-disabled account entry whose ID is `publicKey`, or the first
  * non-disabled account entry as a fallback.
  */
-function selectValidAccount () {
-  if (!dom.accountSelector[dom.accountSelector.selectedIndex].disabled) return
-  else dom.accountSelector.value = undefined
+function selectValidAccount (publicKey) {
+  if (dom.accountSelector.value) {
+    const index = dom.accountSelector.selectedIndex
+    const selected = dom.accountSelector[index]
+    if (selected.disabled) dom.accountSelector.value = undefined
+  }
 
   for (let index in dom.accountSelector.childNodes) {
     const node = dom.accountSelector.childNodes[index]
@@ -527,8 +529,10 @@ function selectValidAccount () {
       break
     } else if (!dom.accountSelector.value) {
       dom.accountSelector.selectedIndex = index
+      selectionIsValid = true
     }
   }
+
   refreshPublicKey()
   return currentAccount()
 }
