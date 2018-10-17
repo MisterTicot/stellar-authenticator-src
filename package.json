@@ -1,6 +1,6 @@
 {
   "name": "stellar-authenticator",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "description": "An application to easily & securely sign Stellar transactions",
   "author": "MisterTicot",
   "repository": "github:cosmic-plus/webapp-stellar-authenticator",
