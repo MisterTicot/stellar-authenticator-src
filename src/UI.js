@@ -529,7 +529,6 @@ function selectValidAccount (publicKey) {
       break
     } else if (!dom.accountSelector.value) {
       dom.accountSelector.selectedIndex = index
-      selectionIsValid = true
     }
   }
 
