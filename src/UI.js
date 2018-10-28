@@ -80,7 +80,7 @@ function login () {
     })
     popup.html.appendinsertBefore(newNode, passwordNode)
     popup.inputs.password = newNode
-    html.appenddestroy(passwordNode)
+    html.destroy(passwordNode)
   }
 
   const last = localStorage.lastSelectedUser
@@ -579,7 +579,7 @@ async function refreshPublicKey () {
   else dom.publicKey.value = null
 
   const copiedNode = html.grab('#copied')
-  if (copiedNode) html.appenddestroy(copiedNode)
+  if (copiedNode) html.destroy(copiedNode)
 }
 
 /** *************************** Copy field *************************************/
@@ -587,7 +587,7 @@ async function refreshPublicKey () {
 export async function copyContent (element) {
   if (html.copyContent(element) && document.activeElement.value) {
     const prevNode = html.grab('#copied')
-    if (prevNode) html.appenddestroy(prevNode)
+    if (prevNode) html.destroy(prevNode)
     const copiedNode = html.create('div', '#copied', 'Copied')
     element.parentNode.insertBefore(copiedNode, element.nextSibling)
     setTimeout(() => { copiedNode.style.opacity = 0 }, 3000)
