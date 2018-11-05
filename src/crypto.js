@@ -1,19 +1,19 @@
 const crypto = exports
 
-const nacl = require('tweetnacl')
-const scrypt = require('scrypt-async')
-const utils = require('tweetnacl-util')
+const nacl = require("tweetnacl")
+const scrypt = require("scrypt-async")
+const utils = require("tweetnacl-util")
 
 /**
  * Current protocol protocol.
  */
-crypto.protocol = '1'
+crypto.protocol = "1"
 
 /**
  * Scrypt options history.
  */
 crypto.optionsTable = {
-  1: { N: 16384, r: 8, p: 1, dkLen: 32, encoding: 'binary' }
+  1: { N: 16384, r: 8, p: 1, dkLen: 32, encoding: "binary" }
 }
 
 /**
@@ -42,16 +42,16 @@ crypto.makeSalt = function (length = nacl.secretbox.keyLength) {
  */
 crypto.deriveKey = function (password, salt, options = crypto.options) {
   return new Promise(function (resolve, reject) {
-    if (!password || !salt) { throw new Error('Missing argument') }
+    if (!password || !salt) { throw new Error("Missing argument") }
 
-    if (typeof options === 'string') {
+    if (typeof options === "string") {
       options = crypto.optionsTable[options]
     }
 
     try {
       scrypt(password, utils.decodeBase64(salt), options, resolve)
     } catch (error) {
-      console.log(error)
+      console.error(error)
       reject(error)
     }
   })
@@ -67,13 +67,13 @@ crypto.deriveKey = function (password, salt, options = crypto.options) {
  * @return {string} Encrypted `string`
  */
 crypto.encryptString = async function (string, key, salt) {
-  if (!string || !key) throw new Error('Missing argument')
+  if (!string || !key) throw new Error("Missing argument")
 
   if (salt) key = await crypto.deriveKey(key, salt)
   const nonce = nacl.randomBytes(nacl.secretbox.nonceLength)
   const cipherText = nacl.secretbox(utils.decodeUTF8(string), nonce, key)
 
-  return crypto.protocol + ':' + utils.encodeBase64(nonce) + ':' + utils.encodeBase64(cipherText)
+  return crypto.protocol + ":" + utils.encodeBase64(nonce) + ":" + utils.encodeBase64(cipherText)
 }
 
 /**
@@ -86,7 +86,7 @@ crypto.encryptString = async function (string, key, salt) {
  * @return {string} The decrypted string
  */
 crypto.decryptString = async function (encrypted, key, salt) {
-  if (!encrypted || !key) throw new Error('Missing argument')
+  if (!encrypted || !key) throw new Error("Missing argument")
 
   let protocol, options, cipherText, nonce
 
@@ -98,7 +98,7 @@ crypto.decryptString = async function (encrypted, key, salt) {
     salt = encrypted.salt
   } else {
     /// Decrypt keystring (@cosmic-plus format).
-    const temp = encrypted.split(':')
+    const temp = encrypted.split(":")
     protocol = temp[0]
     options = crypto.optionsTable[protocol]
     nonce = utils.decodeBase64(temp[1])
@@ -106,13 +106,13 @@ crypto.decryptString = async function (encrypted, key, salt) {
     if (temp[3]) salt = temp[3]
 
     if (!options || !nonce || !cipherText) {
-      throw new Error('Invalid encrypted object')
+      throw new Error("Invalid encrypted object")
     }
   }
 
   if (salt) key = await crypto.deriveKey(key, salt, options)
   const seed = nacl.secretbox.open(cipherText, nonce, key)
-  if (!seed) throw new Error('Wrong password')
+  if (!seed) throw new Error("Wrong password")
 
   return utils.encodeUTF8(seed)
 }

@@ -3,23 +3,23 @@
  * time an update is available and run from there.
  */
 
-const hostname = location.host.replace(/:.*/,'')
-const ENABLED = hostname !== 'localhost' && hostname !== '127.0.0.1'
-const PACKAGE = require('../package.json').name
-const VERSION = require('../package.json').version
+const hostname = location.host.replace(/:.*/,"")
+const ENABLED = hostname !== "localhost" && hostname !== "127.0.0.1"
+const PACKAGE = require("../package.json").name
+const VERSION = require("../package.json").version
 const ROOT = `${location.protocol}//${location.host}/`
 const TIMEOUT = 1000
 const CACHE_NAME = `${PACKAGE}-${VERSION}`
 const CACHE_FILES = [
-  '/',
-  'authenticator.css',
-  'authenticator.js',
-  'cosmic-lib.css',
-  'index.html',
-  'stellar-sdk.js'
+  "/",
+  "authenticator.css",
+  "authenticator.js",
+  "cosmic-lib.css",
+  "index.html",
+  "stellar-sdk.js"
 ]
 
-self.addEventListener('install', function (event) {
+self.addEventListener("install", function (event) {
   console.log(`Installing ${CACHE_NAME}...`)
   event.waitUntil(precache(CACHE_FILES)
     .then(() => self.skipWaiting())
@@ -27,17 +27,17 @@ self.addEventListener('install', function (event) {
   )
 })
 
-self.addEventListener('activate', function (event) {
+self.addEventListener("activate", function (event) {
   event.waitUntil(cleanCache())
 })
 
-self.addEventListener('fetch', function (event) {
-  if (!ENABLED || event.request.method !== 'GET') return
+self.addEventListener("fetch", function (event) {
+  if (!ENABLED || event.request.method !== "GET") return
   if (!event.request.url.match(startByRoot)) return
 
   /// Strip out query string from request.
-  const request = new Request(event.request.url.replace(/\?.*$/, ''))
-  const filename = request.url.replace(startByRoot, '') || 'index.html'
+  const request = new Request(event.request.url.replace(/\?.*$/, ""))
+  const filename = request.url.replace(startByRoot, "") || "index.html"
 
   event.respondWith(
     fromCache(request).then(cached => {
@@ -52,7 +52,7 @@ self.addEventListener('fetch', function (event) {
   )
 })
 
-const startByRoot = new RegExp('^' + ROOT)
+const startByRoot = new RegExp("^" + ROOT)
 
 /**
  * Cache `files` into `cacheName`, then return.

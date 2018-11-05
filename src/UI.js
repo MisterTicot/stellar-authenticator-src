@@ -1,20 +1,20 @@
-const axios = require('@cosmic-plus/base/axios')
-const cosmicLib = require('cosmic-lib')
+const axios = require("@cosmic-plus/base/axios")
+const cosmicLib = require("cosmic-lib")
 const CosmicLink = cosmicLib.CosmicLink
-const dom = require('@cosmic-plus/jsutils/dom')
-const file = require('@cosmic-plus/jsutils/file')
-const Form = require('@cosmic-plus/jsutils/form')
-const html = require('@cosmic-plus/jsutils/html')
-const StellarSdk = require('@cosmic-plus/base/stellar-sdk')
+const dom = require("@cosmic-plus/jsutils/dom")
+const file = require("@cosmic-plus/jsutils/file")
+const Form = require("@cosmic-plus/jsutils/form")
+const html = require("@cosmic-plus/jsutils/html")
+const StellarSdk = require("@cosmic-plus/base/stellar-sdk")
 
-const crypto = require('./crypto')
-const Database = require('./database')
-const Popup = require('./popup')
+const crypto = require("./crypto")
+const Database = require("./database")
+const Popup = require("./popup")
 const passwordPopup = Popup.passwordPopup
-const Notification = require('./notifications')
+const Notification = require("./notifications")
 
 /** Preload **/
-cosmicLib.load.styles('cosmic-lib.css')
+cosmicLib.load.styles("cosmic-lib.css")
 
 /** Global variables **/
 
@@ -28,13 +28,13 @@ const global = {
 /** Install button **/
 let deferredPrompt
 
-window.addEventListener('beforeinstallprompt', function (event) {
+window.addEventListener("beforeinstallprompt", function (event) {
   event.preventDefault()
   deferredPrompt = event
   html.show(dom.installApp)
 })
 
-dom.installApp.addEventListener('click', function (event) {
+dom.installApp.addEventListener("click", function () {
   html.hide(dom.installApp)
   deferredPrompt.prompt()
   deferredPrompt = undefined
@@ -46,7 +46,6 @@ dom.installApp.addEventListener('click', function (event) {
  * In `cosmicLib.config.aliases.__proto__` => Default aliases
  * In `cosmicLib.config.aliases` => User-related aliases
  */
-console.log(cosmicLib.config)
 cosmicLib.config.aliases = Object.create(cosmicLib.config.aliases)
 
 /** ************************* Login in *****************************************/
@@ -72,11 +71,11 @@ function login () {
   selectNode.onchange = () => {
     usernameNode.value = selectNode.value
     const passwordNode = popup.inputs.password
-    passwordNode.name = ''
-    const newNode = html.create('input', {
-      name: 'password',
-      type: 'password',
-      placeholder: 'Authenticator password'
+    passwordNode.name = ""
+    const newNode = html.create("input", {
+      name: "password",
+      type: "password",
+      placeholder: "Authenticator password"
     })
     popup.html.appendinsertBefore(newNode, passwordNode)
     popup.inputs.password = newNode
@@ -86,28 +85,28 @@ function login () {
   const last = localStorage.lastSelectedUser
   if (last) selectNode.selectedIndex = last
 
-  const popup = new Popup('Please enter your password to start', true)
+  const popup = new Popup("Please enter your password to start", true)
   const inputs = popup.inputs
-  const usernameNode = html.create('input', {
+  const usernameNode = html.create("input", {
     readonly: true,
     value: selectNode.value,
-    name: 'username'
+    name: "username"
   })
   html.hide(usernameNode)
 
-  popup.addNode('usernameSelector', selectNode)
-    .addNode('', usernameNode)
-    .addPasswordBox('password')
-    .addSubmit('Open')
+  popup.addNode("usernameSelector", selectNode)
+    .addNode("", usernameNode)
+    .addPasswordBox("password")
+    .addSubmit("Open")
     .addSeparator()
-    .addNode('', html.create('a', { onclick: () => newUser(popup) }, 'New User'))
-    .addNode('', ' | ')
-    .addNode('', html.create('a', { onclick: () => importUser(popup) }, 'Import User'))
-    .addNode('', ' | ')
-    .addNode('', html.create('a', { onclick: () => guestMode(popup) }, 'Guest Mode'))
+    .addNode("", html.create("a", { onclick: () => newUser(popup) }, "New User"))
+    .addNode("", " | ")
+    .addNode("", html.create("a", { onclick: () => importUser(popup) }, "Import User"))
+    .addNode("", " | ")
+    .addNode("", html.create("a", { onclick: () => guestMode(popup) }, "Guest Mode"))
     .select()
     .addValidator(async function () {
-      await popup.setInfo('Opening your session...')
+      await popup.setInfo("Opening your session...")
       localStorage.lastSelectedUser = inputs.usernameSelector.selectedIndex
       const username = inputs.usernameSelector.value
       const password = inputs.password.value
@@ -119,27 +118,27 @@ function login () {
 }
 
 function makeUserSelector () {
-  const selectNode = html.create('select')
+  const selectNode = html.create("select")
   const usernames = Database.listUsers()
   usernames.forEach(user => {
-    html.append(selectNode, html.create('option', { value: user }, user))
+    html.append(selectNode, html.create("option", { value: user }, user))
   })
   return selectNode
 }
 
 export function newUser (loginPopup) {
-  const popup = new Popup('Please pick a name and a password', loginPopup)
-  popup.addTextBox('username', 'Username')
-    .addPasswordBox('password', 'Authenticator password')
-    .addPasswordBox('password2', 'Password confirmation')
+  const popup = new Popup("Please pick a name and a password", loginPopup)
+  popup.addTextBox("username", "Username")
+    .addPasswordBox("password", "Authenticator password")
+    .addPasswordBox("password2", "Password confirmation")
     .addCancelConfirmButtons()
     .addValidator(async () => {
       const username = popup.inputs.username.value
       const password = popup.inputs.password.value
       const confirmation = popup.inputs.password2.value
-      if (password !== confirmation) throw new Error('Password mismatch')
+      if (password !== confirmation) throw new Error("Password mismatch")
 
-      await popup.setInfo('Creating user...')
+      await popup.setInfo("Creating user...")
       global.db = await Database.new(username, password)
       await global.db.newAccount(password, username)
       if (loginPopup) loginPopup.destroy()
@@ -156,21 +155,21 @@ export function newUser (loginPopup) {
 }
 
 export function importUser (loginPopup) {
-  const popup = new Popup('Import user', loginPopup)
+  const popup = new Popup("Import user", loginPopup)
   popup.putInfoNode()
-    .addFileSelector('file', 'Select backup')
-    .addTextBox('username', 'Username')
-    .addPasswordBox('password', 'User password')
+    .addFileSelector("file", "Select backup")
+    .addTextBox("username", "Username")
+    .addPasswordBox("password", "User password")
     .addCancelConfirmButtons()
     .addValidator(async () => {
       const user = popup.inputs.username.value
       const password = popup.inputs.password.value
 
-      if (localStorage[user + '_database']) {
+      if (localStorage[user + "_database"]) {
         throw new Error("There's already an user called: " + user)
       }
 
-      await popup.setInfo('Loading user...')
+      await popup.setInfo("Loading user...")
       const encrypted = await file.load(popup.inputs.file.files[0])
       global.db = await Database.open(user, password, encrypted)
       await global.db.save()
@@ -181,8 +180,8 @@ export function importUser (loginPopup) {
   const prevHandler = popup.inputs.file.onchange
   popup.inputs.file.onchange = function () {
     prevHandler()
-    const filename = popup.inputs.file.value.replace(/^.*\\/, '')
-    if (filename.substr(-5) === '.user' && !popup.inputs.username.value) {
+    const filename = popup.inputs.file.value.replace(/^.*\\/, "")
+    if (filename.substr(-5) === ".user" && !popup.inputs.username.value) {
       popup.inputs.username.value = filename.substr(0, filename.length - 5)
       popup.inputs.password.focus()
     }
@@ -200,33 +199,33 @@ export function importUser (loginPopup) {
 const loginOptions = new Form(dom.loginOptions)
 
 export async function guestMode (form = loginOptions) {
-  await form.setInfo('Opening guest session...')
+  await form.setInfo("Opening guest session...")
   const password = crypto.makeSalt(3)
   sessionStorage.password = password
-  global.db = await Database.new('guest', password)
-  await global.db.newAccount(password, 'Guest', 'test')
+  global.db = await Database.new("guest", password)
+  await global.db.newAccount(password, "Guest", "test")
   if (form.isPopup) form.destroy()
   else form.reset()
   open()
 }
 
 async function upgrade () {
-  const popup = new Popup('Database upgrade', true)
+  const popup = new Popup("Database upgrade", true)
   popup.addMessage(`Stellar Authenticator has been upgraded and the secure
       database has been rewritten. In order to switch to the new format, please
       provide an username and your password.`)
     .addSeparator()
     .putInfoNode()
-    .addTextBox('user', 'Username')
-    .addPasswordBox('password', 'Authenticator password')
+    .addTextBox("user", "Username")
+    .addPasswordBox("password", "Authenticator password")
     .addSubmit()
     .addValidator(async () => {
-      await popup.setInfo('Upgrading database...')
+      await popup.setInfo("Upgrading database...")
       const username = popup.inputs.user.value
       const password = popup.inputs.password.value
       global.db = await Database.upgrade(username, password)
-      localStorage[username + '_lastSelected'] = localStorage.index - 1
-      localStorage.upgraded = 'true'
+      localStorage[username + "_lastSelected"] = localStorage.index - 1
+      localStorage.upgraded = "true"
       open()
     })
 }
@@ -239,11 +238,11 @@ async function open () {
   refreshPage()
 
   /// Show guest mode password
-  if (sessionStorage.password) dom.password.textContent = 'Password: ' + sessionStorage.password
+  if (sessionStorage.password) dom.password.textContent = "Password: " + sessionStorage.password
 }
 
 function handleQuery () {
-  if (location.search === '?about') {
+  if (location.search === "?about") {
     about()
     return
   }
@@ -268,8 +267,8 @@ function handleQuery () {
 const openUriForm = new Form(dom.openUri)
   .addValidator(() => {
     const uri = openUriForm.inputs.uri.value
-    const query = uri.replace(/^[^?]*/, '')
-    if (query < 2) throw new Error('Not a transaction link')
+    const query = uri.replace(/^[^?]*/, "")
+    if (query < 2) throw new Error("Not a transaction link")
     pushQuery(query)
     openUriForm.reset()
   })
@@ -280,15 +279,15 @@ const openXdrForm = new Form(dom.openXdr)
       const inputs = openXdrForm.inputs
       const xdr = inputs.xdr.value
       new StellarSdk.Transaction(xdr)
-      let query = '?xdr=' + xdr
-      if (inputs.stripSource.checked) query += '&stripSource'
-      else if (inputs.stripSequence.checked) query += '&stripSequence'
-      else if (inputs.stripSignatures.checked) query += '&stripSignatures'
+      let query = "?xdr=" + xdr
+      if (inputs.stripSource.checked) query += "&stripSource"
+      else if (inputs.stripSequence.checked) query += "&stripSequence"
+      else if (inputs.stripSignatures.checked) query += "&stripSignatures"
       pushQuery(query)
       openXdrForm.reset()
     } catch (error) {
-      console.log(error)
-      throw new Error('Invalid XDR')
+      console.error(error)
+      throw new Error("Invalid XDR")
     }
   })
 
@@ -307,8 +306,8 @@ async function parseQuery (query = location.search) {
   let account = currentAccount()
   const cosmicLink = global.cosmicLink = new CosmicLink(query)
   uriBox.value = cosmicLink.uri
-  xdrBox.value = cosmicLink.xdr || ''
-  xdrBox.placeholder = cosmicLink.status || 'Computing...'
+  xdrBox.value = cosmicLink.xdr || ""
+  xdrBox.placeholder = cosmicLink.status || "Computing..."
 
   const tdesc = cosmicLink.tdesc
 
@@ -329,7 +328,7 @@ async function parseQuery (query = location.search) {
     account = selectValidAccount()
   }
 
-  const network = cosmicLib.config.network = (account && global.db.network(account)) || 'public'
+  const network = cosmicLib.config.network = (account && global.db.network(account)) || "public"
   const publicKey = cosmicLib.config.source = account && global.db.publicKey(account)
 
   if (!account) {
@@ -339,7 +338,7 @@ async function parseQuery (query = location.search) {
     // }
   } else {
     /// Check if account exists.
-    const loadingMsg = new Notification('loading', 'Loading account...')
+    const loadingMsg = new Notification("loading", "Loading account...")
 
     const accountIsEmpty = await cosmicLib.resolve.isAccountEmpty(publicKey)
     loadingMsg.destroy()
@@ -347,10 +346,10 @@ async function parseQuery (query = location.search) {
 
     /// Fund empty test accounts.
     if (accountIsEmpty) {
-      if (network === 'test') {
+      if (network === "test") {
         await fundTestAccount(publicKey)
       } else {
-        new Notification('warning', 'Empty account')
+        new Notification("warning", "Empty account")
       }
     }
   }
@@ -358,7 +357,7 @@ async function parseQuery (query = location.search) {
   try {
     await cosmicLink.lock()
     if (account || tdesc.source) xdrBox.value = cosmicLink.xdr
-    else xdrBox.placeholder = 'No source account selected'
+    else xdrBox.placeholder = "No source account selected"
   } catch (error) {
     xdrBox.placeholder = cosmicLink.status
     console.error(error)
@@ -397,7 +396,7 @@ async function parseQuery (query = location.search) {
   if (global.signers.length === 0) {
     dom.accountSelector.selectedIndex = -1
     refreshPublicKey()
-    new Notification('warning', 'No signer for this transaction',
+    new Notification("warning", "No signer for this transaction",
       "There's no legit signer for this transaction among your accounts.")
     return
   }
@@ -408,18 +407,18 @@ async function parseQuery (query = location.search) {
 }
 
 async function fundTestAccount (publicKey) {
-  const fundingMsg = new Notification('loading', 'Funding testnet account...')
+  const fundingMsg = new Notification("loading", "Funding testnet account...")
   const account = currentAccount()
 
   try {
-    await axios('https://friendbot.stellar.org/?addr=' + publicKey)
+    await axios("https://friendbot.stellar.org/?addr=" + publicKey)
     fundingMsg.destroy()
   } catch (error) {
     console.error(error)
     fundingMsg.destroy()
     if (currentAccount() !== account) return
-    new Notification('warning', "Can't fund account",
-      'For some reason, Stellar friend bot could not fund your testnet account.')
+    new Notification("warning", "Can't fund account",
+      "For some reason, Stellar friend bot could not fund your testnet account.")
   }
 }
 
@@ -430,11 +429,11 @@ const xdrBox = xdrViewerForm.inputs.xdr
 dom.signingButton.disabled = true
 
 export function signAndSend () {
-  const popup = passwordPopup(global.db.username, 'Sign & send')
+  const popup = passwordPopup(global.db.username, "Sign & send")
   popup.addValidator(async password => {
     const cosmicLink = global.cosmicLink
     const signers = global.signers
-    await popup.setInfo('Signing transaction...')
+    await popup.setInfo("Signing transaction...")
 
     const keypairs = await global.db.keypair(password, ...signers)
     if (signers.length === 1) cosmicLink.sign(keypairs)
@@ -443,7 +442,7 @@ export function signAndSend () {
     dom.signingButton.disabled = true
     uriBox.value = cosmicLink.uri
     xdrBox.value = cosmicLink.xdr
-    history.replaceState(null, '', cosmicLink.query)
+    history.replaceState(null, "", cosmicLink.query)
     dom.accountSelector.childNodes.forEach(node => {
       if (!cosmicLink.transaction.hasSigner(node.publicKey)) node.disabled = true
     })
@@ -451,15 +450,15 @@ export function signAndSend () {
     popup.destroy()
 
     top()
-    const message2 = new Notification('loading', 'Sending transaction...')
+    const message2 = new Notification("loading", "Sending transaction...")
     try {
       const response = await cosmicLink.send()
-      if (!response.stellarGuard) new Notification('done', 'Transaction validated')
-      else new Notification('done', 'Transaction submitted to Stellar Guard')
+      if (!response.stellarGuard) new Notification("done", "Transaction validated")
+      else new Notification("done", "Transaction submitted to Stellar Guard")
     } catch (error) {
-      console.log(error.response)
+      console.error(error.response)
       const message = error.response.data.message || error
-      new Notification('warning', 'Transaction rejected', message)
+      new Notification("warning", "Transaction rejected", message)
     }
     message2.destroy()
   })
@@ -475,14 +474,14 @@ function resetReadTransactionPage () {
   html.clear(dom.cosmiclink_description)
   uriViewerForm.reset()
   xdrViewerForm.reset()
-  xdrBox.placeholder = 'Computing...'
+  xdrBox.placeholder = "Computing..."
   dom.signingButton.disabled = true
 }
 
 /** ****************************** History *************************************/
 
 export function pushQuery (query) {
-  history.pushState(null, '', query)
+  history.pushState(null, "", query)
   handleQuery()
 }
 
@@ -491,7 +490,7 @@ export function popQuery () {
     global.history === history.length &&
     !document.referrer
   ) {
-    history.replaceState(null, '', '?')
+    history.replaceState(null, "", "?")
     handleQuery()
   } else {
     history.back()
@@ -540,7 +539,7 @@ export function selectAccount (account) {
   if (!account) account = dom.accountSelector.value
   else dom.accountSelector.value = account
 
-  localStorage[global.db.username + '_lastSelected'] = dom.accountSelector.selectedIndex
+  localStorage[global.db.username + "_lastSelected"] = dom.accountSelector.selectedIndex
   refreshPublicKey()
   handleQuery()
   resetMenu()
@@ -556,8 +555,8 @@ function refreshAccountSelector () {
   const accountsHtmlNodes = global.db.listAccounts().map(name => {
     const publicKey = global.db.publicKey(name)
     const network = global.db.network(name)
-    const description = network + ': ' + name
-    const htmlNode = html.create('option',
+    const description = network + ": " + name
+    const htmlNode = html.create("option",
       { value: name, publicKey: publicKey, network: network },
       description)
     return [ description, htmlNode ]
@@ -565,11 +564,11 @@ function refreshAccountSelector () {
 
   accountsHtmlNodes.forEach(pair => html.append(dom.accountSelector, pair[1]))
 
-  let lastIndex = localStorage[global.db.username + '_lastSelected'] || 0
+  let lastIndex = localStorage[global.db.username + "_lastSelected"] || 0
   if (lastIndex > accountsHtmlNodes.length - 1) {
     lastIndex = accountsHtmlNodes.length - 1
   }
-  localStorage[global.db.username + '_lastSelected'] = lastIndex
+  localStorage[global.db.username + "_lastSelected"] = lastIndex
   dom.accountSelector.selectedIndex = lastIndex
 }
 
@@ -578,7 +577,7 @@ async function refreshPublicKey () {
   if (account) dom.publicKey.value = global.db.publicKey(account)
   else dom.publicKey.value = null
 
-  const copiedNode = html.grab('#copied')
+  const copiedNode = html.grab("#copied")
   if (copiedNode) html.destroy(copiedNode)
 }
 
@@ -586,9 +585,9 @@ async function refreshPublicKey () {
 
 export async function copyContent (element) {
   if (html.copyContent(element) && document.activeElement.value) {
-    const prevNode = html.grab('#copied')
+    const prevNode = html.grab("#copied")
     if (prevNode) html.destroy(prevNode)
-    const copiedNode = html.create('div', '#copied', 'Copied')
+    const copiedNode = html.create("div", "#copied", "Copied")
     element.parentNode.insertBefore(copiedNode, element.nextSibling)
     setTimeout(() => { copiedNode.style.opacity = 0 }, 3000)
   }
@@ -601,8 +600,8 @@ export function showMenu () {
   html.show(dom.settings)
   html.hide(dom.main)
 
-  dom.header.style.minHeight = '100%'
-  dom.header.style.position = 'absolute'
+  dom.header.style.minHeight = "100%"
+  dom.header.style.position = "absolute"
   dom.menuButton.onclick = hideMenu
   top()
 }
@@ -612,7 +611,7 @@ function hideMenu () {
   html.show(dom.main)
 
   dom.header.style.minHeight = null
-  dom.header.style.position = 'fixed'
+  dom.header.style.position = "fixed"
   dom.menuButton.onclick = showMenu
   resetMenu()
   top()
@@ -624,25 +623,25 @@ function resetMenu () {
 
 export function showSetting (setting) {
   resetMenu()
-  html.grab('.show', dom.settings).className = ''
-  setting.className = 'show'
+  html.grab(".show", dom.settings).className = ""
+  setting.className = "show"
 }
 
 export function showSecret () {
   const account = currentAccount()
   if (!account) return
   const popup = passwordPopup(global.db.username,
-    'Show secret seed for: ' + account,
-    'Your secret seed offer full control over your account and should never be given away.'
+    "Show secret seed for: " + account,
+    "Your secret seed offer full control over your account and should never be given away."
   )
 
   popup.addValidator(async password => {
-    await popup.setInfo('Decrypting secret seed...')
+    await popup.setInfo("Decrypting secret seed...")
     const seed = await global.db.secretSeed(password, account)
     dom.secretSeed.value = seed
     html.show(dom.secretSeed)
     dom.switchSecret.onclick = hideSecret
-    dom.switchSecret.value = 'Hide secret seed'
+    dom.switchSecret.value = "Hide secret seed"
   })
 }
 
@@ -650,7 +649,7 @@ function hideSecret () {
   dom.secretSeed.value = undefined
   html.hide(dom.secretSeed)
   dom.switchSecret.onclick = showSecret
-  dom.switchSecret.value = 'Show secret seed'
+  dom.switchSecret.value = "Show secret seed"
 }
 
 export function removeAccount () {
@@ -658,14 +657,14 @@ export function removeAccount () {
   if (!account) return
 
   const popup = passwordPopup(global.db.username,
-    'Remove account: ' + account,
+    "Remove account: " + account,
     `You're about to remove this account from this device. Please make sure
     that you have an alternative way to access it, or that there's no more
     funds on it.`
   )
 
   popup.addValidator(async password => {
-    await popup.setInfo('Removing account...')
+    await popup.setInfo("Removing account...")
     const publicKey = global.db.publicKey(account)
     await global.db.removeAccount(password, account)
     cosmicLib.config.removeAliases([publicKey])
@@ -674,19 +673,19 @@ export function removeAccount () {
 }
 
 export function importSeed () {
-  const popup = new Popup('Import account from seed')
-  popup.addTextBox('name', 'Account name')
-    .addTextBox('seed', 'Secret seed')
-    .addCheckBox('testnet', 'On testnet', false)
+  const popup = new Popup("Import account from seed")
+  popup.addTextBox("name", "Account name")
+    .addTextBox("seed", "Secret seed")
+    .addCheckBox("testnet", "On testnet", false)
     .addSeparator()
     .addPasswordConfirmation(global.db.username)
     .addValidator(async function () {
       const name = popup.inputs.name.value
       const password = popup.inputs.password.value
       const seed = popup.inputs.seed.value
-      const network = popup.inputs.testnet.checked ? 'test' : 'public'
+      const network = popup.inputs.testnet.checked ? "test" : "public"
 
-      await popup.setInfo('Importing account...')
+      await popup.setInfo("Importing account...")
       await global.db.addAccount(password, name, seed, network)
       refreshAccountSelector()
       selectAccount(name)
@@ -695,17 +694,17 @@ export function importSeed () {
 }
 
 export function newAccount () {
-  const popup = new Popup('Create a new account')
-  popup.addTextBox('name', 'Account name')
-    .addCheckBox('testnet', 'On testnet', false)
+  const popup = new Popup("Create a new account")
+  popup.addTextBox("name", "Account name")
+    .addCheckBox("testnet", "On testnet", false)
     .addSeparator()
     .addPasswordConfirmation(global.db.username)
     .addValidator(async function () {
       const name = popup.inputs.name.value
       const password = popup.inputs.password.value
-      const network = popup.inputs.testnet.checked ? 'test' : 'public'
+      const network = popup.inputs.testnet.checked ? "test" : "public"
 
-      await popup.setInfo('Creating new account...')
+      await popup.setInfo("Creating new account...")
       await global.db.newAccount(password, name, network)
       cosmicLib.config.addAliases(global.db.aliases)
       refreshAccountSelector()
@@ -715,51 +714,51 @@ export function newAccount () {
 }
 
 export function exportBackup () {
-  const popup = passwordPopup(global.db.username, 'Make backup for: ' + global.db.username)
+  const popup = passwordPopup(global.db.username, "Make backup for: " + global.db.username)
   popup.addValidator(async password => {
-    await popup.setInfo('Checking password...')
+    await popup.setInfo("Checking password...")
     const backup = await global.db.backup(password)
-    file.save(global.db.username + '.user', backup)
+    file.save(global.db.username + ".user", backup)
   })
 }
 
 export function passwordChange () {
-  const popup = new Popup('Change password')
+  const popup = new Popup("Change password")
   popup.addAutofillPasswordBox(global.db.username)
-    .addPasswordBox('password2', 'New password')
-    .addPasswordBox('password3', 'Confirmation')
+    .addPasswordBox("password2", "New password")
+    .addPasswordBox("password3", "Confirmation")
     .addCancelConfirmButtons()
     .addValidator(async function () {
       const password = popup.inputs.password.value
       const password2 = popup.inputs.password2.value
       const password3 = popup.inputs.password3.value
 
-      if (password2 !== password3) throw new Error('New passwords mismatch')
-      await popup.setInfo('Setting new password...')
+      if (password2 !== password3) throw new Error("New passwords mismatch")
+      await popup.setInfo("Setting new password...")
       await global.db.changePassword(password, password2)
 
       /// Delete guest mode default password
       if (sessionStorage.password) {
         delete sessionStorage.password
-        dom.password.textContent = ''
+        dom.password.textContent = ""
       }
     })
 
   /// Prevent those box to be filled in by current password in guest mode.
-  popup.inputs.password2.value = ''
-  popup.inputs.password3.value = ''
+  popup.inputs.password2.value = ""
+  popup.inputs.password3.value = ""
 }
 
-export function removeUser (password) {
+export function removeUser () {
   const popup = passwordPopup(global.db.username,
-    'Remove user: ' + global.db.username,
+    "Remove user: " + global.db.username,
     `You're about to remove this profile and all associated accounts from
     this device. Please make sure that you have an alternative way to access
     them, or that there's no more funds on them.`
   )
 
   popup.addValidator(async password => {
-    await popup.setInfo('Deleting account...')
+    await popup.setInfo("Deleting account...")
     await global.db.delete(password)
     logout()
   })
@@ -770,7 +769,7 @@ export function logout () {
   global.db.logout()
   delete global.db
   clearMessages()
-  history.replaceState(null, '', '?')
+  history.replaceState(null, "", "?")
 
   /// Remove user-related aliases.
   cosmicLib.config.aliases = Object.create(cosmicLib.config.aliases.__proto__)
@@ -801,7 +800,7 @@ export function selectPage (element) {
 }
 
 export function currentPage () {
-  return html.grab('.page', dom.main)
+  return html.grab(".page", dom.main)
 }
 
 function headerShowTitle () {
@@ -832,7 +831,7 @@ function footerShowDisclaimer () {
   html.show(dom.disclaimer)
 }
 
-const openAboutPage = () => { pushQuery('?about') }
+const openAboutPage = () => { pushQuery("?about") }
 function footerShowAbout () {
   html.hide(dom.disclaimer)
   html.show(dom.social)

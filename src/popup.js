@@ -1,15 +1,15 @@
-const dom = require('@cosmic-plus/jsutils/dom')
-const Form = require('@cosmic-plus/jsutils/form')
-const html = require('@cosmic-plus/jsutils/html')
+const dom = require("@cosmic-plus/jsutils/dom")
+const Form = require("@cosmic-plus/jsutils/form")
+const html = require("@cosmic-plus/jsutils/html")
 
-dom.shadow = html.create('div', '#shadow')
+dom.shadow = html.create("div", "#shadow")
 dom.body.insertBefore(dom.shadow, dom.body.firstChild)
 
 const Popup = module.exports = class Popup {
   constructor (title, noShadow) { return createPopup(title, noShadow) }
 }
 
-Popup.passwordPopup = function (username, title = 'Please confirm this operation', message) {
+Popup.passwordPopup = function (username, title = "Please confirm this operation", message) {
   const popup = new Popup(title)
   if (message) popup.addMessage(message).addSeparator()
   popup.putInfoNode()
@@ -21,8 +21,8 @@ Popup.passwordPopup = function (username, title = 'Please confirm this operation
 function createPopup (title, noShadow) {
   const popup = new Form()
   popup.isPopup = true
-  popup.window = html.create('div', '.popup', popup.node)
-  popup.addNode('', html.create('h3', null, title)).addSeparator().putInfoNode()
+  popup.window = html.create("div", ".popup", popup.node)
+  popup.addNode("", html.create("h3", null, title)).addSeparator().putInfoNode()
   html.append(dom.body, popup.window)
 
   if (!noShadow) popup.shadow = true
@@ -34,7 +34,7 @@ function createPopup (title, noShadow) {
     return popup
   }
 
-  popup.show = function (noShadow) { showPopup(popup, noShadow); return popup }
+  popup.show = function () { showPopup(popup); return popup }
   popup.hide = function () { hidePopup(popup); return popup }
   popup.destroy = function () { destroyPopup(popup) }
   popup.onExit = popup.destroy
@@ -43,14 +43,14 @@ function createPopup (title, noShadow) {
   return popup
 }
 
-function showPopup (popup, noShadow) {
+function showPopup (popup) {
   html.show(popup.window)
   if (popup.shadow) {
-    dom.shadow.style.display = 'block'
+    dom.shadow.style.display = "block"
     dom.shadow.onclick = () => popup.onExit()
-    html.appendClass(dom.header, 'blur')
-    html.appendClass(dom.main, 'blur')
-    dom.body.style.overflow = 'hidden'
+    html.appendClass(dom.header, "blur")
+    html.appendClass(dom.main, "blur")
+    dom.body.style.overflow = "hidden"
   }
   html.append(dom.body, popup.window)
 }
@@ -58,11 +58,11 @@ function showPopup (popup, noShadow) {
 function hidePopup (popup) {
   popup.onExit = function () { popup.hide(); popup.reset() }
   if (popup.window.parentNode === dom.body) dom.body.removeChild(popup.window)
-  dom.body.style.overflow = 'auto'
+  dom.body.style.overflow = "auto"
   if (popup.shadow) {
     html.hide(dom.shadow)
-    dom.header.classList.remove('blur')
-    dom.main.classList.remove('blur')
+    dom.header.classList.remove("blur")
+    dom.main.classList.remove("blur")
   }
 }
 
@@ -72,12 +72,12 @@ function destroyPopup (popup) {
 }
 
 function addCloseButton (popup) {
-  popup.addSubmit('close')
+  popup.addSubmit("close")
   popup.inputs.submit.focus()
 }
 
 function addCancelConfirmButtons (popup) {
-  popup.addButton('cancel', '✘ Cancel', popup.onExit)
-    .addNode('', html.create('div', '.padding', ' '))
+  popup.addButton("cancel", "✘ Cancel", popup.onExit)
+    .addNode("", html.create("div", ".padding", " "))
     .addSubmit().select()
 }
