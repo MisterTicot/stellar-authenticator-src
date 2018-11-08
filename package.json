@@ -40,8 +40,8 @@
   },
   "dependencies": {
     "@cosmic-plus/base": "^1.1.0",
-    "@cosmic-plus/jsutils": "^1.6.0",
-    "cosmic-lib": "^1.1.0",
+    "@cosmic-plus/jsutils": "^1.7.0",
+    "cosmic-lib": "^1.1.1",
     "scrypt-async": "^2.0.0",
     "tweetnacl": "^1.0.0",
     "tweetnacl-util": "^0.15.0"
