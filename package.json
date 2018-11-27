@@ -21,9 +21,9 @@
     "build-html": "cp -fl src/*.html web",
     "build-js": "webpack -p && cp -f node_modules/stellar-sdk/dist/stellar-sdk.min.js web/stellar-sdk.js",
     "build-misc": "cp -f AUTHORS LICENSE README.md package-lock.json web",
-    "build": "for i in js css html misc; do npm run build-$i || return; done",
+    "build": "sh setenv.sh -p && for i in js css html misc; do npm run build-$i || return; done",
     "check": "npm run get && cp web/package-lock.json . && npm ci && npm run build && cd web && git status",
-    "watch": "webpack -d --watch",
+    "watch": "sh setenv.sh -d && npm run build-html && webpack -d --watch",
     "serve": "npm run watch & cd web && live-server --no-browser"
   },
   "devDependencies": {
