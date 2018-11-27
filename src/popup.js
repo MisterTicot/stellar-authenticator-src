@@ -2,7 +2,7 @@ const dom = require("@cosmic-plus/jsutils/dom")
 const Form = require("@cosmic-plus/jsutils/form")
 const html = require("@cosmic-plus/jsutils/html")
 
-dom.shadow = html.create("div", "#shadow")
+dom.shadow = html.create("div", { id: "shadow", hidden: true })
 dom.body.insertBefore(dom.shadow, dom.body.firstChild)
 
 const Popup = module.exports = class Popup {
@@ -46,7 +46,7 @@ function createPopup (title, noShadow) {
 function showPopup (popup) {
   html.show(popup.window)
   if (popup.shadow) {
-    dom.shadow.style.display = "block"
+    html.show(dom.shadow)
     dom.shadow.onclick = () => popup.onExit()
     html.appendClass(dom.header, "blur")
     html.appendClass(dom.main, "blur")

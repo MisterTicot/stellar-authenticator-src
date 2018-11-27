@@ -336,7 +336,6 @@ header select
 
 #settings
 {
-  display: none;
   max-width: 40em;
   margin: auto;
   padding: 0 0.5em;
@@ -482,7 +481,6 @@ header select
 
 #shadow
 {
-  display: none;
   position: fixed;
   top: 0;
   z-index: 2;
