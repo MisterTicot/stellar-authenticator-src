@@ -17,7 +17,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --fix src/*.js",
     "get": "git submodule update --init --recursive",
-    "build-css": "cat src/*.css | autoprefixer-cli -o web/authenticator.css && cp -f node_modules/cosmic-lib/web/cosmic-lib.css web",
+    "build-css": "npm run build-css:1 && npm run build-css:2",
+    "build-css:1": "cat node_modules/normalize.css/normalize.css src/*.css | autoprefixer-cli -o web/authenticator.css",
+    "build-css:2": "cp -f node_modules/cosmic-lib/web/cosmic-lib.css web",
     "build-html": "cp -fl src/*.html web",
     "build-js": "webpack -p && cp -f node_modules/stellar-sdk/dist/stellar-sdk.min.js web/stellar-sdk.js",
     "build-misc": "cp -f AUTHORS LICENSE README.md package-lock.json web",
@@ -42,6 +44,7 @@
     "@cosmic-plus/base": "^1.2.0",
     "@cosmic-plus/jsutils": "^1.10.0",
     "cosmic-lib": "^1.2.2",
+    "normalize.css": "^8.0.1",
     "scrypt-async": "^2.0.0",
     "tweetnacl": "^1.0.0",
     "tweetnacl-util": "^0.15.0"

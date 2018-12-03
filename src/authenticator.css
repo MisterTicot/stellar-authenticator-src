@@ -27,6 +27,10 @@
 
 /* Universal rules */
 
+[hidden] {
+  display: none!important;
+}
+
 ::selection { background: lightblue; }
 
 /* Page layout */
