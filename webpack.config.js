@@ -19,7 +19,7 @@ const library = Object.assign({}, config, {
   entry: './src/index.js',
   output: {
     path: __dirname + '/web',
-    filename: 'authenticator.js',
+    filename: 'index.js',
     chunkFilename: '[name].js',
     library: 'authenticator',
     libraryTarget: 'var'

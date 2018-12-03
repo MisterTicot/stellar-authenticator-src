@@ -6,10 +6,10 @@ const pkg = require("../package.json")
 new ServiceWorker(pkg.name, pkg.version, "verbose")
   .fromCache([
     "/",
-    "authenticator.css",
-    "authenticator.js",
     "cosmic-lib.css",
+    "index.css",
     "index.html",
+    "index.js",
     "stellar-sdk.js"
   ])
   .precache()

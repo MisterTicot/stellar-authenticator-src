@@ -18,7 +18,7 @@
     "lint": "eslint --fix src/*.js",
     "get": "git submodule update --init --recursive",
     "build-css": "npm run build-css:1 && npm run build-css:2",
-    "build-css:1": "cat node_modules/normalize.css/normalize.css src/*.css | autoprefixer-cli -o web/authenticator.css",
+    "build-css:1": "cat node_modules/normalize.css/normalize.css src/*.css | autoprefixer-cli -o web/index.css",
     "build-css:2": "cp -f node_modules/cosmic-lib/web/cosmic-lib.css web",
     "build-html": "cp -fl src/*.html web",
     "build-js": "webpack -p && cp -f node_modules/stellar-sdk/dist/stellar-sdk.min.js web/stellar-sdk.js",
