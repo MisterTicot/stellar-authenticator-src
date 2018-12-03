@@ -48,7 +48,7 @@ body
   height: 100%;
   padding: 3.5em 0 4em 0;
   background: aliceblue;
-  font-family: "Trebuchet MS", Helvetica, sans-serif;
+  font-family: Arial, sans-serif;
 }
 
 header
@@ -116,7 +116,7 @@ hr
 {
   height: 2px;
   clear: both;
-  margin-top: 0.5em;
+  margin: 0.80em;
   border: 0;
   background-image: linear-gradient(to right, rgba(0, 0, 0, 0), lightgrey, rgba(0, 0, 0, 0));
 }
