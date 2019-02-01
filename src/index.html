@@ -143,6 +143,14 @@
     <h2>Transaction</h2>
     <p id="cosmiclink_description"></p>
 
+    <form id="validation">
+      <input id="signingButton" type="button"
+        onclick="authenticator.signAndSend()" value="Sign &amp; Send"
+      >
+      <input type="button" onclick="authenticator.closeTransaction()"
+        value="Close">
+    </form>
+
     <hr>
 
     <form id="uriViewer">
@@ -157,18 +165,6 @@
       <h3>Transaction XDR</h3>
       <textarea name="xdr" placeholder="Computing..." rows="3" readonly
         onclick="authenticator.copyContent(this)"></textarea>
-    </form>
-
-    <hr>
-
-    <form>
-      <input id="signingButton" type="button"
-        onclick="authenticator.signAndSend()" value="Sign &amp; Send"
-      >
-    </form>
-    <form>
-      <input type="button" onclick="authenticator.closeTransaction()"
-        value="Close">
     </form>
 
   </div>
