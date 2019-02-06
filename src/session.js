@@ -12,9 +12,9 @@ window.addEventListener("storage", function (event) {
   if (!event.newValue) return
 
   if (
-    event.key === "getSessionStorage" &&
-    sessionStorage.length &&
-    !localStorage.sessionStorage
+    event.key === "getSessionStorage"
+    && sessionStorage.length
+    && !localStorage.sessionStorage
   ) {
     /// Send opening key for non-sensitive data to other tabs.
     localStorage.sessionStorage = JSON.stringify(sessionStorage)
@@ -25,11 +25,18 @@ window.addEventListener("storage", function (event) {
     sessionStorage.username = data.username
     sessionStorage.userkey = data.userkey
     if (data.password) sessionStorage.password = data.password
-  } else if (!document.hasFocus() && (event.key.substr(-9) === "_database" || event.key === "logout")) {
+  } else if (
+    !document.hasFocus()
+    && (event.key.substr(-9) === "_database" || event.key === "logout")
+  ) {
     /// Logout / refresh database on all tabs.
     sessionStorage.clear()
     location.reload()
-  } else if (!document.hasFocus() && event.key === "login" && !sessionStorage.length) {
+  } else if (
+    !document.hasFocus()
+    && event.key === "login"
+    && !sessionStorage.length
+  ) {
     /// Login on all tabs.
     location.reload()
   }

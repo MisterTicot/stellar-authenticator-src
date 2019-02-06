@@ -40,7 +40,8 @@ const Database = module.exports = class Database {
    * @return {Database} The user new Database object
    */
   static async new (username, password = "") {
-    if (localStorage[username + "_database"]) throw new Error("User already exist")
+    if (localStorage[username + "_database"])
+      throw new Error("User already exist")
     const salt = crypto.makeSalt()
     const concat = concatCredentials(username, password)
     const key = await crypto.deriveKey(concat, salt)
@@ -124,7 +125,11 @@ const Database = module.exports = class Database {
     const concat = concatCredentials(this.username, newPassword)
     const salt = crypto.makeSalt()
     const key = await crypto.deriveKey(concat, salt)
-    const encryptedSeedsKey = await crypto.encryptString(seedsKey, "seeds" + concat, salt)
+    const encryptedSeedsKey = await crypto.encryptString(
+      seedsKey,
+      "seeds" + concat,
+      salt
+    )
     this.table.seedsKey = encryptedSeedsKey
 
     this.salt = salt
@@ -135,7 +140,11 @@ const Database = module.exports = class Database {
 
   async seedsKey (password = "") {
     const concat = "seeds" + concatCredentials(this.username, password)
-    const key = await crypto.decryptString(this.table.seedsKey, concat, this.salt)
+    const key = await crypto.decryptString(
+      this.table.seedsKey,
+      concat,
+      this.salt
+    )
     return utils.decodeBase64(key)
   }
 
@@ -145,7 +154,11 @@ const Database = module.exports = class Database {
     const publicKey = seedToPublicKey(seed)
     const seedsKey = await this.seedsKey(password)
     const encryptedSeed = await crypto.encryptString(seed, seedsKey)
-    this.accounts[name] = { id: publicKey, seed: encryptedSeed, network: network }
+    this.accounts[name] = {
+      id: publicKey,
+      seed: encryptedSeed,
+      network: network
+    }
     refreshAliases(this)
     await this.save()
   }
@@ -164,14 +177,21 @@ const Database = module.exports = class Database {
   }
 
   /// Retrieve datas
-  get accounts () { return this.table.accounts }
-  get contacts () { return this.table.contacts }
-  get version () { return this.table.version }
+  get accounts () {
+    return this.table.accounts
+  }
+  get contacts () {
+    return this.table.contacts
+  }
+  get version () {
+    return this.table.version
+  }
 
   static listUsers () {
     const array = []
     Object.keys(localStorage).forEach(entry => {
-      if (entry.substr(-9) === "_database") array.push(entry.substr(0, entry.length - 9))
+      if (entry.substr(-9) === "_database")
+        array.push(entry.substr(0, entry.length - 9))
     })
     return sortCI(array)
   }
@@ -186,7 +206,10 @@ const Database = module.exports = class Database {
     const seeds = []
     for (let index in names) {
       const account = names[index]
-      const seed = await crypto.decryptString(this.accounts[account].seed, seedsKey)
+      const seed = await crypto.decryptString(
+        this.accounts[account].seed,
+        seedsKey
+      )
       seeds.push(seed)
     }
     if (seeds.length === 1) return seeds[0]
@@ -218,8 +241,8 @@ const Database = module.exports = class Database {
   accountName (publicKey, network) {
     for (let account in this.accounts) {
       if (
-        this.accounts[account].id === publicKey &&
-        this.accounts[account].network === network
+        this.accounts[account].id === publicKey
+        && this.accounts[account].network === network
       ) {
         return account
       }
@@ -244,7 +267,11 @@ const Database = module.exports = class Database {
     this.checkAccountDoesntExist(name)
     const publicKey = seedToPublicKey(seed)
     const encryptedSeed = await crypto.encryptString(seed, seedsKey)
-    this.accounts[name] = { id: publicKey, seed: encryptedSeed, network: network }
+    this.accounts[name] = {
+      id: publicKey,
+      seed: encryptedSeed,
+      network: network
+    }
     refreshAliases(this)
     this.save()
   }
@@ -320,7 +347,9 @@ function refreshAliases (database) {
 }
 
 function sortCI (array) {
-  return array.sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase()))
+  return array.sort((a, b) =>
+    a[0].toLowerCase().localeCompare(b[0].toLowerCase())
+  )
 }
 
 /** ********************** Upgrade from alpha databases ************************/

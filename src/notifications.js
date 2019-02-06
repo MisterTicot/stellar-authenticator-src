@@ -15,7 +15,13 @@ module.exports = class Notification {
     if (delay) helpers.timeout(delay).then(() => this.destroy())
   }
 
-  show () { this.hidden = false }
-  hide () { this.hidden = true }
-  destroy () { html.destroy(this.node) }
+  show () {
+    this.hidden = false
+  }
+  hide () {
+    this.hidden = true
+  }
+  destroy () {
+    html.destroy(this.node)
+  }
 }

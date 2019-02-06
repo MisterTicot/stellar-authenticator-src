@@ -94,16 +94,26 @@ function login () {
   })
   html.hide(usernameNode)
 
-  popup.addNode("usernameSelector", selectNode)
+  popup
+    .addNode("usernameSelector", selectNode)
     .addNode("", usernameNode)
     .addPasswordBox("password")
     .addSubmit("Open")
     .addSeparator()
-    .addNode("", html.create("a", { onclick: () => newUser(popup) }, "New User"))
+    .addNode(
+      "",
+      html.create("a", { onclick: () => newUser(popup) }, "New User")
+    )
     .addNode("", " | ")
-    .addNode("", html.create("a", { onclick: () => importUser(popup) }, "Import User"))
+    .addNode(
+      "",
+      html.create("a", { onclick: () => importUser(popup) }, "Import User")
+    )
     .addNode("", " | ")
-    .addNode("", html.create("a", { onclick: () => guestMode(popup) }, "Guest Mode"))
+    .addNode(
+      "",
+      html.create("a", { onclick: () => guestMode(popup) }, "Guest Mode")
+    )
     .select()
     .addValidator(async function () {
       await popup.setInfo("Opening your session...")
@@ -128,7 +138,8 @@ function makeUserSelector () {
 
 export function newUser (loginPopup) {
   const popup = new Popup("Please pick a name and a password", loginPopup)
-  popup.addTextBox("username", "Username")
+  popup
+    .addTextBox("username", "Username")
     .addPasswordBox("password", "Authenticator password")
     .addPasswordBox("password2", "Password confirmation")
     .addCancelConfirmButtons()
@@ -156,7 +167,8 @@ export function newUser (loginPopup) {
 
 export function importUser (loginPopup) {
   const popup = new Popup("Import user", loginPopup)
-  popup.putInfoNode()
+  popup
+    .putInfoNode()
     .addFileSelector("file", "Select backup")
     .addTextBox("username", "Username")
     .addPasswordBox("password", "User password")
@@ -211,9 +223,12 @@ export async function guestMode (form = loginOptions) {
 
 async function upgrade () {
   const popup = new Popup("Database upgrade", true)
-  popup.addMessage(`Stellar Authenticator has been upgraded and the secure
+  popup
+    .addMessage(
+      `Stellar Authenticator has been upgraded and the secure
       database has been rewritten. In order to switch to the new format, please
-      provide an username and your password.`)
+      provide an username and your password.`
+    )
     .addSeparator()
     .putInfoNode()
     .addTextBox("user", "Username")
@@ -238,7 +253,8 @@ async function open () {
   refreshPage()
 
   /// Show guest mode password
-  if (sessionStorage.password) dom.password.textContent = "Password: " + sessionStorage.password
+  if (sessionStorage.password)
+    dom.password.textContent = "Password: " + sessionStorage.password
 }
 
 function handleQuery () {
@@ -264,32 +280,30 @@ function handleQuery () {
 
 /** **************************** Open transaction ******************************/
 
-const openUriForm = new Form(dom.openUri)
-  .addValidator(() => {
-    const uri = openUriForm.inputs.uri.value
-    const query = uri.replace(/^[^?]*/, "")
-    if (query < 2) throw new Error("Not a transaction link")
-    pushQuery(query)
-    openUriForm.reset()
-  })
+const openUriForm = new Form(dom.openUri).addValidator(() => {
+  const uri = openUriForm.inputs.uri.value
+  const query = uri.replace(/^[^?]*/, "")
+  if (query < 2) throw new Error("Not a transaction link")
+  pushQuery(query)
+  openUriForm.reset()
+})
 
-const openXdrForm = new Form(dom.openXdr)
-  .addValidator(() => {
-    try {
-      const inputs = openXdrForm.inputs
-      const xdr = inputs.xdr.value
-      new StellarSdk.Transaction(xdr)
-      let query = "?xdr=" + xdr
-      if (inputs.stripSource.checked) query += "&stripSource"
-      else if (inputs.stripSequence.checked) query += "&stripSequence"
-      else if (inputs.stripSignatures.checked) query += "&stripSignatures"
-      pushQuery(query)
-      openXdrForm.reset()
-    } catch (error) {
-      console.error(error)
-      throw new Error("Invalid XDR")
-    }
-  })
+const openXdrForm = new Form(dom.openXdr).addValidator(() => {
+  try {
+    const inputs = openXdrForm.inputs
+    const xdr = inputs.xdr.value
+    new StellarSdk.Transaction(xdr)
+    let query = "?xdr=" + xdr
+    if (inputs.stripSource.checked) query += "&stripSource"
+    else if (inputs.stripSequence.checked) query += "&stripSequence"
+    else if (inputs.stripSignatures.checked) query += "&stripSignatures"
+    pushQuery(query)
+    openXdrForm.reset()
+  } catch (error) {
+    console.error(error)
+    throw new Error("Invalid XDR")
+  }
+})
 
 export function openXdrOption (element) {
   if (element.checked) {
@@ -328,8 +342,10 @@ async function parseQuery (query = location.search) {
     account = selectValidAccount()
   }
 
-  const network = cosmicLib.config.network = (account && global.db.network(account)) || "public"
-  const publicKey = cosmicLib.config.source = account && global.db.publicKey(account)
+  const network = cosmicLib.config.network =
+    account && global.db.network(account) || "public"
+  const publicKey = cosmicLib.config.source =
+    account && global.db.publicKey(account)
 
   if (!account) {
     // if (!cosmicLink.tdesc.source) {
@@ -396,8 +412,11 @@ async function parseQuery (query = location.search) {
   if (global.signers.length === 0) {
     dom.accountSelector.selectedIndex = -1
     refreshPublicKey()
-    new Notification("warning", "No signer for this transaction",
-      "There's no legit signer for this transaction among your accounts.")
+    new Notification(
+      "warning",
+      "No signer for this transaction",
+      "There's no legit signer for this transaction among your accounts."
+    )
     return
   }
 
@@ -417,8 +436,11 @@ async function fundTestAccount (publicKey) {
     console.error(error)
     fundingMsg.destroy()
     if (currentAccount() !== account) return
-    new Notification("warning", "Can't fund account",
-      "For some reason, Stellar friend bot could not fund your testnet account.")
+    new Notification(
+      "warning",
+      "Can't fund account",
+      "For some reason, Stellar friend bot could not fund your testnet account."
+    )
   }
 }
 
@@ -444,7 +466,8 @@ export function signAndSend () {
     xdrBox.value = cosmicLink.xdr
     history.replaceState(null, "", cosmicLink.query)
     dom.accountSelector.childNodes.forEach(node => {
-      if (!cosmicLink.transaction.hasSigner(node.publicKey)) node.disabled = true
+      if (!cosmicLink.transaction.hasSigner(node.publicKey))
+        node.disabled = true
     })
 
     popup.destroy()
@@ -453,7 +476,8 @@ export function signAndSend () {
     const message2 = new Notification("loading", "Sending transaction...")
     try {
       const response = await cosmicLink.send()
-      if (!response.stellarGuard) new Notification("done", "Transaction validated")
+      if (!response.stellarGuard)
+        new Notification("done", "Transaction validated")
       else new Notification("done", "Transaction submitted to Stellar Guard")
     } catch (error) {
       console.error(error.response)
@@ -486,10 +510,7 @@ export function pushQuery (query) {
 }
 
 export function popQuery () {
-  if (
-    global.history === history.length &&
-    !document.referrer
-  ) {
+  if (global.history === history.length && !document.referrer) {
     history.replaceState(null, "", "?")
     handleQuery()
   } else {
@@ -539,7 +560,8 @@ export function selectAccount (account) {
   if (!account) account = dom.accountSelector.value
   else dom.accountSelector.value = account
 
-  localStorage[global.db.username + "_lastSelected"] = dom.accountSelector.selectedIndex
+  localStorage[global.db.username + "_lastSelected"] =
+    dom.accountSelector.selectedIndex
   refreshPublicKey()
   handleQuery()
   resetMenu()
@@ -550,17 +572,24 @@ function currentAccount () {
 }
 
 function refreshAccountSelector () {
-  while (dom.accountSelector.options.length) { dom.accountSelector.remove(0) }
+  while (dom.accountSelector.options.length) {
+    dom.accountSelector.remove(0)
+  }
 
-  const accountsHtmlNodes = global.db.listAccounts().map(name => {
-    const publicKey = global.db.publicKey(name)
-    const network = global.db.network(name)
-    const description = network + ": " + name
-    const htmlNode = html.create("option",
-      { value: name, publicKey: publicKey, network: network },
-      description)
-    return [ description, htmlNode ]
-  }).sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase()))
+  const accountsHtmlNodes = global.db
+    .listAccounts()
+    .map(name => {
+      const publicKey = global.db.publicKey(name)
+      const network = global.db.network(name)
+      const description = network + ": " + name
+      const htmlNode = html.create(
+        "option",
+        { value: name, publicKey: publicKey, network: network },
+        description
+      )
+      return [description, htmlNode]
+    })
+    .sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase()))
 
   accountsHtmlNodes.forEach(pair => html.append(dom.accountSelector, pair[1]))
 
@@ -589,7 +618,9 @@ export async function copyContent (element) {
     if (prevNode) html.destroy(prevNode)
     const copiedNode = html.create("div", "#copied", "Copied")
     element.parentNode.insertBefore(copiedNode, element.nextSibling)
-    setTimeout(() => { copiedNode.style.opacity = 0 }, 3000)
+    setTimeout(() => {
+      copiedNode.style.opacity = 0
+    }, 3000)
   }
 }
 
@@ -630,7 +661,8 @@ export function showSetting (setting) {
 export function showSecret () {
   const account = currentAccount()
   if (!account) return
-  const popup = passwordPopup(global.db.username,
+  const popup = passwordPopup(
+    global.db.username,
     "Show secret seed for: " + account,
     "Your secret seed offer full control over your account and should never be given away."
   )
@@ -656,7 +688,8 @@ export function removeAccount () {
   const account = currentAccount()
   if (!account) return
 
-  const popup = passwordPopup(global.db.username,
+  const popup = passwordPopup(
+    global.db.username,
     "Remove account: " + account,
     `You're about to remove this account from this device. Please make sure
     that you have an alternative way to access it, or that there's no more
@@ -674,7 +707,8 @@ export function removeAccount () {
 
 export function importSeed () {
   const popup = new Popup("Import account from seed")
-  popup.addTextBox("name", "Account name")
+  popup
+    .addTextBox("name", "Account name")
     .addTextBox("seed", "Secret seed")
     .addCheckBox("testnet", "On testnet", false)
     .addSeparator()
@@ -695,7 +729,8 @@ export function importSeed () {
 
 export function newAccount () {
   const popup = new Popup("Create a new account")
-  popup.addTextBox("name", "Account name")
+  popup
+    .addTextBox("name", "Account name")
     .addCheckBox("testnet", "On testnet", false)
     .addSeparator()
     .addPasswordConfirmation(global.db.username)
@@ -714,7 +749,10 @@ export function newAccount () {
 }
 
 export function exportBackup () {
-  const popup = passwordPopup(global.db.username, "Make backup for: " + global.db.username)
+  const popup = passwordPopup(
+    global.db.username,
+    "Make backup for: " + global.db.username
+  )
   popup.addValidator(async password => {
     await popup.setInfo("Checking password...")
     const backup = await global.db.backup(password)
@@ -724,7 +762,8 @@ export function exportBackup () {
 
 export function passwordChange () {
   const popup = new Popup("Change password")
-  popup.addAutofillPasswordBox(global.db.username)
+  popup
+    .addAutofillPasswordBox(global.db.username)
     .addPasswordBox("password2", "New password")
     .addPasswordBox("password3", "Confirmation")
     .addCancelConfirmButtons()
@@ -750,7 +789,8 @@ export function passwordChange () {
 }
 
 export function removeUser () {
-  const popup = passwordPopup(global.db.username,
+  const popup = passwordPopup(
+    global.db.username,
     "Remove user: " + global.db.username,
     `You're about to remove this profile and all associated accounts from
     this device. Please make sure that you have an alternative way to access
@@ -782,7 +822,9 @@ export function logout () {
 
 /** ***************************** Page switching *******************************/
 
-function top () { scroll(0, 0) }
+function top () {
+  scroll(0, 0)
+}
 
 export function selectPage (element) {
   const previousPage = currentPage()
@@ -831,7 +873,9 @@ function footerShowDisclaimer () {
   html.show(dom.disclaimer)
 }
 
-const openAboutPage = () => { pushQuery("?about") }
+const openAboutPage = () => {
+  pushQuery("?about")
+}
 function footerShowAbout () {
   html.hide(dom.disclaimer)
   html.show(dom.social)

@@ -42,7 +42,9 @@ crypto.makeSalt = function (length = nacl.secretbox.keyLength) {
  */
 crypto.deriveKey = function (password, salt, options = crypto.options) {
   return new Promise(function (resolve, reject) {
-    if (!password || !salt) { throw new Error("Missing argument") }
+    if (!password || !salt) {
+      throw new Error("Missing argument")
+    }
 
     if (typeof options === "string") {
       options = crypto.optionsTable[options]
@@ -73,7 +75,13 @@ crypto.encryptString = async function (string, key, salt) {
   const nonce = nacl.randomBytes(nacl.secretbox.nonceLength)
   const cipherText = nacl.secretbox(utils.decodeUTF8(string), nonce, key)
 
-  return crypto.protocol + ":" + utils.encodeBase64(nonce) + ":" + utils.encodeBase64(cipherText)
+  return (
+    crypto.protocol
+    + ":"
+    + utils.encodeBase64(nonce)
+    + ":"
+    + utils.encodeBase64(cipherText)
+  )
 }
 
 /**

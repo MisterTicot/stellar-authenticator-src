@@ -6,13 +6,20 @@ dom.shadow = html.create("div", { id: "shadow", hidden: true })
 dom.body.insertBefore(dom.shadow, dom.body.firstChild)
 
 const Popup = module.exports = class Popup {
-  constructor (title, noShadow) { return createPopup(title, noShadow) }
+  constructor (title, noShadow) {
+    return createPopup(title, noShadow)
+  }
 }
 
-Popup.passwordPopup = function (username, title = "Please confirm this operation", message) {
+Popup.passwordPopup = function (
+  username,
+  title = "Please confirm this operation",
+  message
+) {
   const popup = new Popup(title)
   if (message) popup.addMessage(message).addSeparator()
-  popup.putInfoNode()
+  popup
+    .putInfoNode()
     .addPasswordConfirmation(username)
     .addValidator(() => popup.inputs.password.value)
   return popup
@@ -22,21 +29,38 @@ function createPopup (title, noShadow) {
   const popup = new Form()
   popup.isPopup = true
   popup.window = html.create("div", ".popup", popup.node)
-  popup.addNode("", html.create("h3", null, title)).addSeparator().putInfoNode()
+  popup
+    .addNode("", html.create("h3", null, title))
+    .addSeparator()
+    .putInfoNode()
   html.append(dom.body, popup.window)
 
   if (!noShadow) popup.shadow = true
 
-  popup.addCloseButton = function () { addCloseButton(popup); return popup }
-  popup.addCancelConfirmButtons = function () { addCancelConfirmButtons(popup); return popup }
+  popup.addCloseButton = function () {
+    addCloseButton(popup)
+    return popup
+  }
+  popup.addCancelConfirmButtons = function () {
+    addCancelConfirmButtons(popup)
+    return popup
+  }
   popup.addPasswordConfirmation = function (username) {
     popup.addAutofillPasswordBox(username).addCancelConfirmButtons()
     return popup
   }
 
-  popup.show = function () { showPopup(popup); return popup }
-  popup.hide = function () { hidePopup(popup); return popup }
-  popup.destroy = function () { destroyPopup(popup) }
+  popup.show = function () {
+    showPopup(popup)
+    return popup
+  }
+  popup.hide = function () {
+    hidePopup(popup)
+    return popup
+  }
+  popup.destroy = function () {
+    destroyPopup(popup)
+  }
   popup.onExit = popup.destroy
 
   popup.show(noShadow)
@@ -56,7 +80,10 @@ function showPopup (popup) {
 }
 
 function hidePopup (popup) {
-  popup.onExit = function () { popup.hide(); popup.reset() }
+  popup.onExit = function () {
+    popup.hide()
+    popup.reset()
+  }
   if (popup.window.parentNode === dom.body) dom.body.removeChild(popup.window)
   dom.body.style.overflow = "auto"
   if (popup.shadow) {
@@ -77,7 +104,9 @@ function addCloseButton (popup) {
 }
 
 function addCancelConfirmButtons (popup) {
-  popup.addButton("cancel", "✘ Cancel", popup.onExit)
+  popup
+    .addButton("cancel", "✘ Cancel", popup.onExit)
     .addNode("", html.create("div", ".padding", " "))
-    .addSubmit().select()
+    .addSubmit()
+    .select()
 }
