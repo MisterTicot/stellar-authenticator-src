@@ -2,6 +2,7 @@ const axios = require("@cosmic-plus/base/axios")
 const cosmicLib = require("cosmic-lib")
 const CosmicLink = cosmicLib.CosmicLink
 const dom = require("@cosmic-plus/jsutils/dom")
+const env = require("@cosmic-plus/jsutils/env")
 const file = require("@cosmic-plus/jsutils/file")
 const Form = require("@cosmic-plus/jsutils/form")
 const html = require("@cosmic-plus/jsutils/html")
@@ -449,6 +450,9 @@ const uriBox = uriViewerForm.inputs.uri
 const xdrViewerForm = new Form(dom.xdrViewer)
 const xdrBox = xdrViewerForm.inputs.xdr
 dom.signingButton.disabled = true
+if (env.isEmbedded) {
+  dom.closeButton.onclick = () => parent.postMessage("close", "*")
+}
 
 export function signAndSend () {
   const popup = passwordPopup(global.db.username, "Sign & send")
@@ -479,6 +483,10 @@ export function signAndSend () {
       if (!response.stellarGuard)
         new Notification("done", "Transaction validated")
       else new Notification("done", "Transaction submitted to Stellar Guard")
+      if (env.isEmbedded) {
+        parent.postMessage("close", "*")
+        dom.closeButton.disabled = true
+      }
     } catch (error) {
       console.error(error.response)
       const message = error.response.data.message || error
