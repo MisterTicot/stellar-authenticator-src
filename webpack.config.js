@@ -21,13 +21,6 @@ const library = Object.assign({}, config, {
     chunkFilename: "[name].js",
     library: "authenticator",
     libraryTarget: "var"
-  },
-  optimization: {
-    splitChunks: {
-      cacheGroups: {
-        vendors: false
-      }
-    }
   }
 })
 
