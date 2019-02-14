@@ -1,0 +1,130 @@
+/* Form styling */
+
+form
+{
+  position: relative;
+  max-width: 30em;
+  margin: 0 auto;
+  text-align: center;
+}
+
+textarea,
+select,
+button,
+input,
+label
+{
+  display: inline-block;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0.2em 0;
+  padding: 0.2em;
+  overflow: hidden;
+
+  transition: all 0.2s ease;
+}
+
+textarea,
+select,
+button,
+input
+{
+  border: solid 2px lightgrey;
+  border-radius: 0.2em;
+  background: ghostwhite;
+}
+
+textarea:hover:enabled,
+input:hover:enabled,
+select:hover:enabled,
+button:hover:enabled
+{
+  border: solid 2px #909090;
+}
+
+textarea[readonly]:hover,
+[type="text"][readonly]:hover,
+select:hover
+{
+  cursor: pointer;
+}
+
+textarea:focus:enabled,
+select:focus:enabled,
+button:focus:enabled,
+input:focus:enabled
+{
+  outline: 0;
+  box-shadow: 0 0 0px 2px lightsteelblue;
+}
+
+textarea[readonly],
+input[readonly]
+{
+  color: #505050;
+}
+
+[type="file"] + label
+{
+  width: 50%;
+}
+
+[type="button"],
+[type="submit"]
+{
+  background: #f0f0f0;
+}
+
+
+[type="button"]:hover:enabled,
+[type="submit"]:hover:enabled,
+[type="button"].enabled
+{
+  background: lightgrey;
+  cursor: pointer;
+}
+
+[type="checkbox"],
+[type="radio"]
+{
+  display: none;
+}
+
+[type="checkbox"] + label,
+[type="radio"] + label
+{
+  margin: 0.1em 0;
+  border: none;
+  background: white;
+  padding: 0.1em;
+  font-style: italic;
+  color: dimgrey;
+}
+
+[type="checkbox"] + label::before,
+[type="radio"] + label::before
+{
+  content: "✘ ";
+}
+
+[type="checkbox"]:checked:enabled + label,
+[type="radio"]:checked:enabled + label
+{
+  background: lightgreen;
+  color: black;
+  font-style: normal;
+}
+
+[type="checkbox"]:checked + label::before,
+[type="radio"]:checked + label::before
+{
+  content: "✔ ";
+}
+
+[type="checkbox"]:enabled + label:hover,
+[type="radio"]:enabled + label:hover
+{
+  background: mediumseagreen;
+  color: black;
+  cursor: pointer;
+}

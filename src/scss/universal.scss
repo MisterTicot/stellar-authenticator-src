@@ -1,0 +1,10 @@
+/* Universal rules */
+
+[hidden] {
+  display: none!important;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+  vertical-align: inherit;
+}
