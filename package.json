@@ -1,6 +1,6 @@
 {
   "name": "stellar-authenticator",
-  "version": "0.13.10",
+  "version": "0.13.11",
   "description": "An application to easily & securely sign Stellar transactions",
   "author": "MisterTicot",
   "repository": "github:cosmic-plus/webapp-stellar-authenticator",
@@ -23,7 +23,7 @@
     "build-scss": "node-sass src/index.scss -o web -t compressed",
     "build-css": "npm run build-scss && autoprefixer-cli web/index.css",
     "build-html": "cp -fl src/*.html web",
-    "build-misc": "cp -f AUTHORS LICENSE README.md package-lock.json web",
+    "build-misc": "cp -f AUTHORS LICENSE README.md CHANGELOG.md package-lock.json web",
     "build": "sh setenv.sh -p && for i in js css html misc; do npm run build-$i || return; done",
     "rebuild": "npm run get && cp -f web/package-lock.json . && npm ci && npm run build",
     "check": "npm run rebuild && cd web && git status",
