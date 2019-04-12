@@ -47,9 +47,9 @@
     "webpack-cli": "^3.2.3"
   },
   "dependencies": {
-    "@cosmic-plus/base": "^1.3.5",
-    "@cosmic-plus/jsutils": "^1.14.7",
-    "cosmic-lib": "^1.2.9",
+    "@cosmic-plus/base": "^1.3.6",
+    "@cosmic-plus/jsutils": "^1.15.0",
+    "cosmic-lib": "^1.2.10",
     "normalize.css": "^8.0.1",
     "scrypt-async": "^2.0.0",
     "tweetnacl": "^1.0.1",

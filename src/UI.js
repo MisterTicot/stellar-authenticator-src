@@ -488,7 +488,6 @@ export function signAndSend () {
         dom.closeButton.disabled = true
       }
     } catch (error) {
-      console.error(error.response)
       const message = error.response.data.message || error
       new Notification("warning", "Transaction rejected", message)
     }
