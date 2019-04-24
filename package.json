@@ -5,7 +5,6 @@
   "author": "MisterTicot",
   "repository": "github:cosmic-plus/webapp-stellar-authenticator",
   "license": "MIT",
-  "browserslist": "last 4 versions, > 0.1%",
   "keywords": [
     "cryptocurrency",
     "stellar",
@@ -16,8 +15,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "get": "git submodule update --init --recursive",
-    "prettier": "prettier --write --no-semi '**.js' 'src/**.js' '**.json' '**.md'",
-    "eslint": "eslint --fix '**.js' 'src/**.js'",
+    "prettier": "prettier --write --no-semi 'src/*.js' '*.js' '*.json' '*.md'",
+    "eslint": "eslint --fix 'src/*.js' '*.js'",
     "lint": "npm run prettier && npm run eslint",
     "build-js": "webpack -p && cp -f node_modules/stellar-sdk/dist/stellar-sdk.min.js web/stellar-sdk.js",
     "build-scss": "node-sass src/index.scss -o web -t compressed",
@@ -27,7 +26,7 @@
     "build": "sh setenv.sh -p && for i in js css html misc; do npm run build-$i || return; done",
     "rebuild": "npm run get && cp -f web/package-lock.json . && npm ci && npm run build",
     "check": "npm run rebuild && cd web && git status",
-    "watch-css": "npm run build-css && node-sass src/index.scss -wo web",
+    "watch-css": "node-sass src/index.scss -wo web",
     "watch-js": "webpack -d --watch",
     "watch": "sh setenv.sh -d && npm run build-html && npm run watch-css & npm run watch-js",
     "serve": "npm run watch & cd web && live-server --no-browser"
@@ -47,9 +46,10 @@
     "webpack-cli": "^3.2.3"
   },
   "dependencies": {
-    "@cosmic-plus/base": "^1.3.6",
-    "@cosmic-plus/jsutils": "^1.15.0",
-    "cosmic-lib": "^1.3.0",
+    "@cosmic-plus/base": "^2.0.0",
+    "@cosmic-plus/domutils": "^2.0.0",
+    "@cosmic-plus/jsutils": "^2.0.0",
+    "cosmic-lib": "^1.4.0",
     "normalize.css": "^8.0.1",
     "scrypt-async": "^2.0.0",
     "tweetnacl": "^1.0.1",

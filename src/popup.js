@@ -1,6 +1,6 @@
-const dom = require("@cosmic-plus/jsutils/dom")
-const Form = require("@cosmic-plus/jsutils/form")
-const html = require("@cosmic-plus/jsutils/html")
+const dom = require("@cosmic-plus/domutils/es5/dom")
+const Form = require("@cosmic-plus/domutils/es5/form")
+const html = require("@cosmic-plus/domutils/es5/html")
 
 dom.shadow = html.create("div", { id: "shadow", hidden: true })
 dom.body.insertBefore(dom.shadow, dom.body.firstChild)

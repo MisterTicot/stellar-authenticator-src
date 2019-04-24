@@ -1,6 +1,6 @@
-const dom = require("@cosmic-plus/jsutils/dom")
-const html = require("@cosmic-plus/jsutils/html")
-const helpers = require("@cosmic-plus/jsutils/misc")
+const dom = require("@cosmic-plus/domutils/es5/dom")
+const html = require("@cosmic-plus/domutils/es5/html")
+const helpers = require("@cosmic-plus/jsutils/es5/misc")
 
 module.exports = class Notification {
   constructor (type, title, message, delay) {
