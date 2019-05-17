@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Update [cosmic-lib] to 1.4.1.
 - Improve compliance with the [PWA] standard.
 - Improve loading time.
 
