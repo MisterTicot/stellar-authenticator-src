@@ -1,6 +1,8 @@
 /// Service worker
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("worker.js")
+const worker = navigator.serviceWorker
+if (worker) {
+  worker.register("worker.js")
+  worker.addEventListener("controllerchange", () => location.reload())
 }
 
 module.exports = require("./UI")
