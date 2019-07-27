@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Improve display on smallest and biggest screens.
+- Automate release procedure.
 
 ## 0.14.1 - 2019-06-18
 
