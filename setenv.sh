@@ -11,10 +11,10 @@
 
 if [ "$1" = "-d" ]; then
   sed -e "s/script-src 'self'/script-src 'unsafe-eval' 'self'/" \
-      -i src/index.html
+      -i static/index.html
 elif [ "$1" = "-p" ]; then
   sed -e "s/ 'unsafe-eval'//g" \
-      -i src/index.html
+      -i static/index.html
 else
   echo "Usage: $(basename $0) [-p|-d]" >&2
   exit 1
