@@ -3,7 +3,7 @@
   "version": "0.14.2",
   "description": "An application to easily & securely sign Stellar transactions",
   "author": "MisterTicot <mister.ticot@cosmic.plus>",
-  "homepage": "",
+  "homepage": "https://stellar-authenticator.org",
   "repository": "github:cosmic-plus/webapp-stellar-authenticator",
   "license": "MIT",
   "keywords": [
