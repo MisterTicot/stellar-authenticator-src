@@ -1,8 +1,8 @@
 @import "../node_modules/normalize.css/normalize";
 @import "../node_modules/cosmic-lib/web/cosmic-lib";
-@import "./scss/screen";
-@import "./scss/universal";
-@import "./scss/form";
+@import "./screen";
+@import "./universal";
+@import "./form";
 
 ::selection { background: lightblue; }
 

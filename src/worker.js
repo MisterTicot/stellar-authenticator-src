@@ -7,7 +7,6 @@ new ServiceWorker(pkg.name, pkg.version, "verbose")
   .fromCache([
     // Application
     "/",
-    "cosmic-lib.css",
     "index.css",
     "index.html",
     "index.js",

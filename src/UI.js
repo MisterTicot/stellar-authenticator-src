@@ -14,9 +14,6 @@ const Popup = require("./popup")
 const passwordPopup = Popup.passwordPopup
 const Notification = require("./notifications")
 
-/** Preload **/
-cosmicLib.load.styles("cosmic-lib.css")
-
 /** Global variables **/
 
 const global = {
@@ -246,11 +243,10 @@ async function upgrade () {
     })
 }
 
-async function open () {
+function open () {
   headerShowAccounts()
   footerShowAbout()
   cosmicLib.config.addAliases(global.db.aliases)
-  await cosmicLib.load.styles()
   refreshPage()
 
   /// Show guest mode password
