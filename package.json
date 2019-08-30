@@ -63,10 +63,10 @@
     "webpack-cli": "^3.3.6"
   },
   "dependencies": {
-    "@cosmic-plus/base": "^2.0.5",
+    "@cosmic-plus/base": "^2.1.0",
     "@cosmic-plus/domutils": "^2.0.2",
     "@cosmic-plus/jsutils": "^2.0.2",
-    "cosmic-lib": "^1.6.0",
+    "cosmic-lib": "^1.8.0",
     "normalize.css": "^8.0.1",
     "scrypt-async": "^2.0.0",
     "tweetnacl": "^1.0.1",
