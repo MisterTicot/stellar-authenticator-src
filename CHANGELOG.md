@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+### Fixed
+
+- Meta: Fix a rare application upgrade bug. Bypass browser cache when fetching
+  latest release to prevent possible unconsistent upgrade.
+
 ## 1.1.1 - 2019-09-02
 
 ### Fixed
