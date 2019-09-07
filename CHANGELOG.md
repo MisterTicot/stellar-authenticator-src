@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 1.2.0 - 2019-09-07
+
+### Changed
+
+- API: Upgrade [cosmic-lib] to 2.x. (protocol changes)
 
 ### Fixed
 
