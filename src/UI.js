@@ -38,6 +38,17 @@ dom.installApp.addEventListener("click", function () {
   deferredPrompt = undefined
 })
 
+/** SEP-0007 handler registration **/
+if (cosmicLib.sep7Utils.isWebHandlerSupported()) {
+  html.show(dom.extraSettings)
+  dom.setSep7Handler.onclick = () => {
+    cosmicLib.sep7Utils.registerWebHandler(
+      location.href.split(/[?#]/, 1)[0],
+      "Stellar Authenticator"
+    )
+  }
+}
+
 /**
  * Protect cosmicLib default aliases.
  *
