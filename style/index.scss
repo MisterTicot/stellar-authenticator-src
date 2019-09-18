@@ -1,7 +1,5 @@
-@import "../node_modules/normalize.css/normalize";
+@import "../node_modules/@cosmic-plus/assets/scss/base";
 @import "../node_modules/cosmic-lib/web/cosmic-lib";
-@import "./screen";
-@import "./universal";
 @import "./form";
 
 ::selection { background: lightblue; }
@@ -11,12 +9,8 @@
 html
 {
   min-height: 100%;
-  box-sizing: border-box;
   position: relative;
   overflow-y: scroll;
-
-  // Prevent Android Chrome font boost.
-  * { max-height: 100%; }
 }
 
 body
