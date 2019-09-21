@@ -1,6 +1,6 @@
 {
   "name": "stellar-authenticator",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "An application to easily & securely sign Stellar transactions",
   "author": "MisterTicot <mister.ticot@cosmic.plus>",
   "homepage": "https://stellar-authenticator.org",
@@ -60,10 +60,10 @@
     "node-sass": "^4.12.0",
     "prettier": "^1.18.2",
     "webpack": "^4.40.2",
-    "webpack-cli": "^3.3.8"
+    "webpack-cli": "^3.3.9"
   },
   "dependencies": {
-    "@cosmic-plus/assets": "^1.0.0",
+    "@cosmic-plus/assets": "^1.0.1",
     "@cosmic-plus/base": "^2.2.0",
     "@cosmic-plus/domutils": "^2.0.4",
     "@cosmic-plus/jsutils": "^2.0.2",
