@@ -1,6 +1,6 @@
 {
   "name": "stellar-authenticator",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "An application to easily & securely sign Stellar transactions",
   "author": "MisterTicot <mister.ticot@cosmic.plus>",
   "homepage": "https://stellar-authenticator.org",
@@ -49,22 +49,22 @@
     "publish-release": "npm run check && npm run tag-release && npm run push-release"
   },
   "devDependencies": {
-    "@babel/core": "^7.6.2",
+    "@babel/core": "^7.6.4",
     "@babel/plugin-transform-runtime": "^7.6.2",
-    "@babel/preset-env": "^7.6.2",
-    "@babel/runtime": "^7.6.2",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/runtime": "^7.6.3",
     "autoprefixer-cli": "^1.0.0",
     "babel-loader": "^8.0.6",
     "eslint": "^5.16.0",
     "live-server": "^1.2.1",
-    "node-sass": "^4.12.0",
+    "node-sass": "^4.13.0",
     "prettier": "^1.18.2",
-    "webpack": "^4.41.0",
+    "webpack": "^4.41.2",
     "webpack-cli": "^3.3.9"
   },
   "dependencies": {
     "@cosmic-plus/assets": "^1.0.1",
-    "@cosmic-plus/base": "^2.3.0",
+    "@cosmic-plus/base": "^2.4.0",
     "@cosmic-plus/domutils": "^2.0.4",
     "@cosmic-plus/jsutils": "^2.0.2",
     "cosmic-lib": "^2.2.0",
