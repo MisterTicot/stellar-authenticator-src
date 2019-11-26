@@ -8,6 +8,8 @@ const Form = require("@cosmic-plus/domutils/es5/form")
 const html = require("@cosmic-plus/domutils/es5/html")
 const StellarSdk = require("@cosmic-plus/base/es5/stellar-sdk")
 
+const TxResultView = require("./view/tx-result-view")
+
 const crypto = require("./crypto")
 const Database = require("./database")
 const Popup = require("./popup")
@@ -485,19 +487,20 @@ export function signAndSend () {
 
     top()
     const message2 = new Notification("loading", "Sending transaction...")
-    try {
-      const response = await cosmicLink.send()
-      if (!response.stellarGuard)
-        new Notification("done", "Transaction validated")
-      else new Notification("done", "Transaction submitted to Stellar Guard")
-      if (env.isEmbedded) {
+    const response = await cosmicLink.send().catch(error => error)
+
+    if (response.stellarGuard) {
+      new Notification("done", "Transaction submitted to Stellar Guard")
+    } else {
+      const result = TxResultView.fromResponse(response)
+      html.rewrite(dom.notifications, result)
+
+      if (env.isEmbedded && result.validated) {
         parent.postMessage("close", "*")
         dom.closeButton.disabled = true
       }
-    } catch (error) {
-      const message = error.response.data.message || error
-      new Notification("warning", "Transaction rejected", message)
     }
+
     message2.destroy()
   })
 }
