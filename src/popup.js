@@ -72,8 +72,8 @@ function showPopup (popup) {
   if (popup.shadow) {
     html.show(dom.shadow)
     dom.shadow.onclick = () => popup.onExit()
-    html.appendClass(dom.header, "blur")
-    html.appendClass(dom.main, "blur")
+    html.addClass(dom.header, "blur")
+    html.addClass(dom.main, "blur")
     dom.body.style.overflow = "hidden"
   }
   html.append(dom.body, popup.window)
