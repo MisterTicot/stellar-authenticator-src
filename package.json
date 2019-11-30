@@ -1,6 +1,6 @@
 {
   "name": "stellar-authenticator",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "description": "An application to easily & securely sign Stellar transactions",
   "author": "MisterTicot <mister.ticot@cosmic.plus>",
   "homepage": "https://stellar-authenticator.org",
@@ -49,26 +49,26 @@
     "publish-release": "npm run check && npm run tag-release && npm run push-release"
   },
   "devDependencies": {
-    "@babel/core": "^7.7.2",
-    "@babel/plugin-transform-runtime": "^7.6.2",
-    "@babel/preset-env": "^7.7.1",
-    "@babel/runtime": "^7.7.2",
+    "@babel/core": "^7.7.4",
+    "@babel/plugin-transform-runtime": "^7.7.4",
+    "@babel/preset-env": "^7.7.4",
+    "@babel/runtime": "^7.7.4",
     "autoprefixer-cli": "^1.0.0",
     "babel-loader": "^8.0.6",
     "eslint": "^5.16.0",
     "live-server": "^1.2.1",
     "node-sass": "^4.13.0",
-    "prettier": "^1.19.0",
+    "prettier": "^1.19.1",
     "webpack": "^4.41.2",
     "webpack-cli": "^3.3.10"
   },
   "dependencies": {
-    "@cosmic-plus/assets": "^1.0.1",
-    "@cosmic-plus/base": "^2.4.0",
-    "@cosmic-plus/domutils": "^2.0.4",
+    "@cosmic-plus/assets": "^1.0.2",
+    "@cosmic-plus/base": "^2.5.1",
+    "@cosmic-plus/domutils": "^2.1.0",
     "@cosmic-plus/jsutils": "^2.0.2",
     "@cosmic-plus/tx-result": "^1.0.1",
-    "cosmic-lib": "^2.2.1",
+    "cosmic-lib": "^2.5.0",
     "scrypt-async": "^2.0.0",
     "tweetnacl": "^1.0.1",
     "tweetnacl-util": "^0.15.0"
