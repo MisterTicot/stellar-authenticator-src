@@ -19,7 +19,7 @@ class TxResultView extends Gui {
 <div class=%state>
   <h3>%title</h3>
 
-  <ul hidden=%validated>
+  <ul hidden=%hideErrors>
     %{toLi:errors...}
   </ul>
 </div>
@@ -27,6 +27,7 @@ class TxResultView extends Gui {
 
     Object.assign(this, txResult)
     this.state = this.validated ? "done" : "warning"
+    this.hideErrors = this.validated || !this.errors.length
   }
 
   toLi (msg) {
