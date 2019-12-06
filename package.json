@@ -67,7 +67,7 @@
     "@cosmic-plus/base": "^2.5.1",
     "@cosmic-plus/domutils": "^2.1.0",
     "@cosmic-plus/jsutils": "^2.0.2",
-    "@cosmic-plus/tx-result": "^1.0.2",
+    "@cosmic-plus/tx-result": "^1.1.0",
     "cosmic-lib": "^2.5.0",
     "scrypt-async": "^2.0.0",
     "tweetnacl": "^1.0.1",

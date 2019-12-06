@@ -9,6 +9,11 @@ const TxResult = require("@cosmic-plus/tx-result")
 
 /* Definition */
 class TxResultView extends Gui {
+  static async forCosmicLink (cosmicLink) {
+    const result = await TxResult.forCosmicLink(cosmicLink)
+    return new TxResultView(result)
+  }
+
   static fromResponse (response) {
     const result = new TxResult(response)
     return new TxResultView(result)

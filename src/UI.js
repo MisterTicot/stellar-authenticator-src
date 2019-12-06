@@ -486,22 +486,15 @@ export function signAndSend () {
     popup.destroy()
 
     top()
-    const message2 = new Notification("loading", "Sending transaction...")
-    const response = await cosmicLink.send().catch(error => error)
+    new Notification("loading", "Sending transaction...")
 
-    if (response.stellarGuard) {
-      new Notification("done", "Transaction submitted to Stellar Guard")
-    } else {
-      const result = TxResultView.fromResponse(response)
-      html.rewrite(dom.notifications, result)
+    const result = await TxResultView.forCosmicLink(cosmicLink)
+    html.rewrite(dom.notifications, result)
 
-      if (env.isEmbedded && result.validated) {
-        parent.postMessage("close", "*")
-        dom.closeButton.disabled = true
-      }
+    if (env.isEmbedded && result.validated) {
+      parent.postMessage("close", "*")
+      dom.closeButton.disabled = true
     }
-
-    message2.destroy()
   })
 }
 
