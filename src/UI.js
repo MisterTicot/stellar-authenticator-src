@@ -268,11 +268,6 @@ function open () {
 }
 
 function handleQuery () {
-  if (location.search === "?about") {
-    about()
-    return
-  }
-
   headerShowAccounts()
   refreshAccountSelector()
   refreshPublicKey()
@@ -869,10 +864,6 @@ function showMessages () {
   html.show(dom.messages)
 }
 
-function hideMessages () {
-  html.hide(dom.messages)
-}
-
 function clearMessages () {
   html.clear(dom.password)
   html.clear(dom.notifications)
@@ -883,18 +874,7 @@ function footerShowDisclaimer () {
   html.show(dom.disclaimer)
 }
 
-const openAboutPage = () => {
-  pushQuery("?about")
-}
 function footerShowAbout () {
   html.hide(dom.disclaimer)
   html.show(dom.social)
-  dom.aboutIcon.onclick = openAboutPage
-}
-
-function about () {
-  headerShowTitle()
-  hideMessages()
-  selectPage(dom.about)
-  dom.aboutIcon.onclick = null
 }
