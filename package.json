@@ -64,7 +64,7 @@
   },
   "dependencies": {
     "@cosmic-plus/assets": "^1.0.2",
-    "@cosmic-plus/base": "^2.5.2",
+    "@cosmic-plus/base": "^2.6.0",
     "@cosmic-plus/domutils": "^2.1.0",
     "@cosmic-plus/jsutils": "^2.0.2",
     "@cosmic-plus/tx-result": "^1.2.0",
