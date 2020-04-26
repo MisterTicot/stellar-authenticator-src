@@ -1,6 +1,6 @@
 {
   "name": "stellar-authenticator",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "An application to easily & securely sign Stellar transactions",
   "author": "MisterTicot <mister.ticot@cosmic.plus>",
   "homepage": "https://stellar-authenticator.org",
@@ -57,9 +57,9 @@
     "babel-loader": "^8.1.0",
     "eslint": "^5.16.0",
     "live-server": "^1.2.1",
-    "node-sass": "^4.13.1",
+    "node-sass": "^4.14.0",
     "prettier": "^1.19.1",
-    "webpack": "^4.42.1",
+    "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11"
   },
   "dependencies": {
