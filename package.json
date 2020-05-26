@@ -64,11 +64,11 @@
   },
   "dependencies": {
     "@cosmic-plus/assets": "^1.0.2",
-    "@cosmic-plus/base": "^2.6.0",
+    "@cosmic-plus/base": "^2.7.0",
     "@cosmic-plus/domutils": "^2.1.0",
     "@cosmic-plus/jsutils": "^2.0.2",
     "@cosmic-plus/tx-result": "^1.3.0",
-    "cosmic-lib": "^2.7.0",
+    "cosmic-lib": "^2.9.0",
     "scrypt-async": "^2.0.0",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1"
