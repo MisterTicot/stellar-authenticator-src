@@ -6,6 +6,7 @@
   "homepage": "https://stellar-authenticator.org",
   "repository": "github:cosmic-plus/webapp-stellar-authenticator",
   "license": "MIT",
+  "browserslist": "extends @kisbox/browserslist-config",
   "keywords": [
     "cryptocurrency",
     "stellar",
@@ -53,6 +54,7 @@
     "@babel/plugin-transform-runtime": "^7.11.5",
     "@babel/preset-env": "^7.11.5",
     "@babel/runtime": "^7.11.2",
+    "@kisbox/browserslist-config": "^1.0.0-beta.17",
     "autoprefixer-cli": "^1.0.0",
     "babel-loader": "^8.1.0",
     "eslint": "^7.13.0",
@@ -68,6 +70,7 @@
     "@cosmic-plus/domutils": "^2.1.0",
     "@cosmic-plus/jsutils": "^2.0.2",
     "@cosmic-plus/tx-result": "^1.4.0",
+    "core-js": "^3.7.0",
     "cosmic-lib": "^2.11.0",
     "scrypt-async": "^2.0.1",
     "tweetnacl": "^1.0.3",
