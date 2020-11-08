@@ -29,10 +29,7 @@ function createPopup (title, noShadow) {
   const popup = new Form()
   popup.isPopup = true
   popup.window = html.create("div", ".popup", popup.node)
-  popup
-    .addNode("", html.create("h3", null, title))
-    .addSeparator()
-    .putInfoNode()
+  popup.addNode("", html.create("h3", null, title)).addSeparator().putInfoNode()
   html.append(dom.body, popup.window)
 
   if (!noShadow) popup.shadow = true

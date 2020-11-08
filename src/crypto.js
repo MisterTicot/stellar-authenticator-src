@@ -150,5 +150,5 @@ crypto.encryptObject = function (object, key, salt) {
  * @return {Object} The decrypted object.
  */
 crypto.decryptObject = function (encrypted, key, salt) {
-  return crypto.decryptString(encrypted, key, salt).then(x => JSON.parse(x))
+  return crypto.decryptString(encrypted, key, salt).then((x) => JSON.parse(x))
 }

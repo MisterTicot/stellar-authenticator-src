@@ -141,7 +141,7 @@ function login () {
 function makeUserSelector () {
   const selectNode = html.create("select")
   const usernames = Database.listUsers()
-  usernames.forEach(user => {
+  usernames.forEach((user) => {
     html.append(selectNode, html.create("option", { value: user }, user))
   })
   return selectNode
@@ -332,7 +332,7 @@ async function parseQuery (query = location.search) {
 
   /// Filter possible signers by network if provided in query.
   if (cosmicLink.tdesc.network) {
-    dom.accountSelector.childNodes.forEach(node => {
+    dom.accountSelector.childNodes.forEach((node) => {
       if (node.network !== cosmicLink.tdesc.network) node.disabled = true
     })
     account = selectValidAccount()
@@ -341,7 +341,7 @@ async function parseQuery (query = location.search) {
   /// Select transaction source account if available.
   if (cosmicLink.tdesc.source) {
     const source = await cosmicLib.resolve.address(cosmicLink.tdesc.source)
-    dom.accountSelector.childNodes.forEach(node => {
+    dom.accountSelector.childNodes.forEach((node) => {
       if (node.publicKey !== source.account_id) node.disabled = true
     })
     account = selectValidAccount()
@@ -403,12 +403,12 @@ async function parseQuery (query = location.search) {
       }
     }
 
-    if (!global.signers.find(entry => entry === account)) {
+    if (!global.signers.find((entry) => entry === account)) {
       dom.accountSelector.value = global.signers[0]
       refreshPublicKey()
     }
   } else {
-    cosmicLink.transaction.signersList.forEach(signer => {
+    cosmicLink.transaction.signersList.forEach((signer) => {
       const accountName = global.db.accountName(signer, network)
       if (accountName) global.signers.push(accountName)
     })
@@ -460,7 +460,7 @@ if (env.isEmbedded) {
 
 export function signAndSend () {
   const popup = passwordPopup(global.db.username, "Sign & send")
-  popup.addValidator(async password => {
+  popup.addValidator(async (password) => {
     const cosmicLink = global.cosmicLink
     const signers = global.signers
     await popup.setInfo("Signing transaction...")
@@ -473,7 +473,7 @@ export function signAndSend () {
     uriBox.value = cosmicLink.uri
     xdrBox.value = cosmicLink.xdr
     history.replaceState(null, "", cosmicLink.query)
-    dom.accountSelector.childNodes.forEach(node => {
+    dom.accountSelector.childNodes.forEach((node) => {
       if (!cosmicLink.transaction.hasSigner(node.publicKey))
         node.disabled = true
     })
@@ -583,7 +583,7 @@ function refreshAccountSelector () {
 
   const accountsHtmlNodes = global.db
     .listAccounts()
-    .map(name => {
+    .map((name) => {
       const publicKey = global.db.publicKey(name)
       const network = global.db.network(name)
       const description = network + ": " + name
@@ -596,7 +596,7 @@ function refreshAccountSelector () {
     })
     .sort((a, b) => a[0].toLowerCase().localeCompare(b[0].toLowerCase()))
 
-  accountsHtmlNodes.forEach(pair => html.append(dom.accountSelector, pair[1]))
+  accountsHtmlNodes.forEach((pair) => html.append(dom.accountSelector, pair[1]))
 
   let lastIndex = localStorage[global.db.username + "_lastSelected"] || 0
   if (lastIndex > accountsHtmlNodes.length - 1) {
@@ -672,7 +672,7 @@ export function showSecret () {
     "Your secret seed offer full control over your account and should never be given away."
   )
 
-  popup.addValidator(async password => {
+  popup.addValidator(async (password) => {
     await popup.setInfo("Decrypting secret seed...")
     const seed = await global.db.secretSeed(password, account)
     dom.secretSeed.value = seed
@@ -701,7 +701,7 @@ export function removeAccount () {
     funds on it.`
   )
 
-  popup.addValidator(async password => {
+  popup.addValidator(async (password) => {
     await popup.setInfo("Removing account...")
     const publicKey = global.db.publicKey(account)
     await global.db.removeAccount(password, account)
@@ -758,7 +758,7 @@ export function exportBackup () {
     global.db.username,
     "Make backup for: " + global.db.username
   )
-  popup.addValidator(async password => {
+  popup.addValidator(async (password) => {
     await popup.setInfo("Checking password...")
     const backup = await global.db.backup(password)
     file.save(global.db.username + ".user", backup)
@@ -802,7 +802,7 @@ export function removeUser () {
     them, or that there's no more funds on them.`
   )
 
-  popup.addValidator(async password => {
+  popup.addValidator(async (password) => {
     await popup.setInfo("Deleting account...")
     await global.db.delete(password)
     logout()

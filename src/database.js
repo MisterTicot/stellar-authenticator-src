@@ -189,7 +189,7 @@ const Database = module.exports = class Database {
 
   static listUsers () {
     const array = []
-    Object.keys(localStorage).forEach(entry => {
+    Object.keys(localStorage).forEach((entry) => {
       if (entry.substr(-9) === "_database")
         array.push(entry.substr(0, entry.length - 9))
     })
@@ -201,7 +201,7 @@ const Database = module.exports = class Database {
   }
 
   async secretSeed (password, ...names) {
-    names.forEach(name => this.checkAccountExist(name))
+    names.forEach((name) => this.checkAccountExist(name))
     const seedsKey = await this.seedsKey(password)
     const seeds = []
     for (let index in names) {
@@ -221,7 +221,7 @@ const Database = module.exports = class Database {
     if (names.length === 1) {
       return StellarSdk.Keypair.fromSecret(secretSeeds)
     } else {
-      const keypairs = secretSeeds.map(entry => {
+      const keypairs = secretSeeds.map((entry) => {
         return StellarSdk.Keypair.fromSecret(entry)
       })
       return keypairs
