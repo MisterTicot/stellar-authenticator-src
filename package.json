@@ -74,7 +74,7 @@
     "@cosmic-plus/jsutils": "^2.0.2",
     "@cosmic-plus/tx-result": "^1.4.0",
     "core-js": "^3.7.0",
-    "cosmic-lib": "^2.12.0",
+    "cosmic-lib": "^2.23.0",
     "scrypt-async": "^2.0.1",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1"
